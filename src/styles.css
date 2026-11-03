@@ -129,8 +129,10 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .skill-target-row { min-height: 58px; padding: 7px 11px; border-top: 1px solid rgba(255,255,255,.06); }
 .skill-target-row strong { font-size: .78rem; }
 .skill-target-row output { text-align: center; color: #f4f7fb; font: 800 1rem ui-monospace, monospace; }
+.skill-target-row output.target-met { color: var(--teal); }
 .skill-target-row b { text-align: center; color: var(--teal); }
-.skill-target-row input { min-width: 0; min-height: 44px; padding: 7px; text-align: center; font-weight: 800; }
+.recommendation-meta { margin: 7px 2px 0; color: var(--muted); font-size: .68rem; }
+.recommendation-meta a { color: var(--teal); }
 .status-summary { display: grid; gap: 10px; }
 .import-missing { border: 1px dashed #425069; border-radius: 11px; padding: 14px; color: var(--muted); background: #0b1018; font-size: .8rem; line-height: 1.65; }
 .status-overview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
@@ -158,6 +160,8 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .overload-options .roll-black { border-color: #e9edf4; background: linear-gradient(90deg, #020304, #0b0d11); box-shadow: inset 4px 0 #000; }
 .overload-options .roll-black span, .overload-options .roll-black > strong { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,.35); }
 .overload-options .roll-black b { color: #050607; background: #fff; }
+.overload-options li.goal-match { outline: 2px solid rgba(94,234,212,.52); outline-offset: -1px; }
+.overload-options li .goal-match-badge { color: #06130f; background: var(--teal); }
 .equipment-card .no-options { color: #68768a; font-size: .66rem; }
 .gear-list { display: grid; gap: 7px; }
 .gear-row { display: grid; grid-template-columns: 30px minmax(90px, 1.4fr) minmax(54px, .7fr) 64px; align-items: center; gap: 7px; }
@@ -171,6 +175,13 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .recommendation-sources { display: flex; gap: 10px; flex-wrap: wrap; }
 .overload-goal { margin-top: 18px; border: 1px solid rgba(155,135,245,.4); border-radius: 14px; padding: 13px; background: linear-gradient(135deg, rgba(155,135,245,.08), transparent 45%), #0b1018; }
 .overload-goal h4 { margin-top: 0; }
+.overload-goal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.overload-goal-head h4 { margin-bottom: 10px; }
+.overload-goal-editor { display: grid; gap: 7px; margin: 12px 0; border: 1px solid rgba(94,234,212,.22); border-radius: 10px; padding: 9px; background: rgba(94,234,212,.035); }
+.overload-goal-edit-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(90px, .8fr) 44px; gap: 6px; }
+.overload-goal-edit-row select, .overload-goal-edit-row input { min-width: 0; }
+.icon-button { min-width: 44px; min-height: 44px; border: 1px solid #49313a; border-radius: 8px; color: #ff9caf; background: #211319; font-size: 1.1rem; }
+.add-goal { justify-self: start; }
 .overload-goal-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .overload-goal-stats span { min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 8px; background: rgba(7,10,15,.72); }
 .overload-goal-stats small, .overload-goal-stats strong { display: block; }
@@ -194,7 +205,6 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .roll-legend span { border-radius: 5px; padding: 4px 6px; }
 .blue-sample { color: #65baff; background: rgba(48,143,255,.1); }
 .black-sample { color: white; border: 1px solid #dce2ea; background: #030405; }
-.cube-target { max-width: 260px; margin-top: 14px; }
 .check { display: flex; grid-auto-flow: column; justify-content: start; align-items: center; gap: 6px; min-height: 44px; }
 .check input { width: 22px; min-height: 22px; height: 22px; accent-color: var(--teal); }
 .check.wide { margin-top: 8px; }
@@ -293,6 +303,9 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   .status-overview > span:last-child { grid-column: 1 / -1; }
   .equipment-grid { grid-template-columns: 1fr; }
   .overload-goal-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .overload-goal-edit-row { grid-template-columns: minmax(0, 1fr) 44px; }
+  .overload-goal-edit-row input { grid-column: 1; }
+  .overload-goal-edit-row .icon-button { grid-column: 2; grid-row: 1 / 3; }
   .suggestion-head .primary { width: 100%; }
   .panel { padding: 15px; }
   .panel-head { align-items: start; }

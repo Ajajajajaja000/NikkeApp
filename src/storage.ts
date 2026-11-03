@@ -20,7 +20,6 @@ export const defaultGear = (): Record<GearSlot, GearRecord> => ({
 export const emptyRecord = (): NikkeRecord => ({
   owned: false,
   favorite: false,
-  target: { skills: [7, 7, 7], gearTier: "T9", overloadCount: 4, cubeLevel: 7 },
 });
 
 const profile = (): LocalProfile => ({ id: "local", name: "この端末", records: {}, savedTeams: [], coreDust: defaultCoreDust() });

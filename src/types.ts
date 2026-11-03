@@ -66,6 +66,11 @@ export interface ImportedSnapshot {
   source: string;
 }
 
+export interface OverloadTarget {
+  effect: string;
+  target: string;
+}
+
 export interface NikkeRecord {
   displayName?: string;
   owned: boolean;
@@ -78,10 +83,13 @@ export interface NikkeRecord {
   cube?: CubeRecord;
   collection?: CollectionRecord;
   target?: {
-    skills: [number, number, number];
-    gearTier: string;
-    overloadCount: number;
-    cubeLevel: number;
+    /** v3以前のバックアップ互換用。現在の画面では静的なキャラ別推奨値を優先する。 */
+    skills?: [number, number, number];
+    gearTier?: string;
+    overloadCount?: number;
+    cubeLevel?: number;
+    /** 未設定なら同梱の推奨値、配列なら利用者が補正した目標を使う。 */
+    overloadGoals?: OverloadTarget[];
   };
   notes?: string;
   manualUpdatedAt?: string;

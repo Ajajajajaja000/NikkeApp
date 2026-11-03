@@ -1,6 +1,6 @@
-import type { GearSlot, NikkeRecord } from "../types";
+import type { GearSlot, NikkeRecord, OverloadTarget } from "../types";
 import { effectiveCollection, effectiveCube, effectiveGear, effectiveLevel, effectiveLimitBreak, effectiveSkills } from "../rules/growth";
-import { overloadRollStyle } from "../rules/overload";
+import { optionMatchesTargets, overloadRollStyle } from "../rules/overload";
 
 const slots: Array<{ id: GearSlot; label: string }> = [
   { id: "head", label: "頭" },
@@ -13,7 +13,7 @@ function limitBreakLabel(value: number) {
   return value <= 3 ? `${value}凸` : `コア${value - 3}`;
 }
 
-export function NikkeStatusSummary({ record }: { record: NikkeRecord }) {
+export function NikkeStatusSummary({ record, overloadTargets = [] }: { record: NikkeRecord; overloadTargets?: OverloadTarget[] }) {
   if (!record.imported) return <div className="import-missing">BlablaLinkから現在値をまだ取得していません。設定画面から取り込むと、育成・装備・オバロを表示します。</div>;
 
   const skills = effectiveSkills(record);
@@ -37,8 +37,9 @@ export function NikkeStatusSummary({ record }: { record: NikkeRecord }) {
           <small>企業：{gear.corporation || "不明"}</small>
           {gear.options?.length ? <ul className="overload-options">{gear.options.map((option, index) => {
             const style = overloadRollStyle(option.rank);
-            return <li className={`roll-${style}`} key={`${option.id ?? option.name}-${index}`}>
-              <div><span>{option.name}</span>{style === "blue" && <b>青字</b>}{style === "black" && <b>黒帯</b>}</div>
+            const matchesGoal = optionMatchesTargets(option.name, overloadTargets);
+            return <li className={`roll-${style} ${matchesGoal ? "goal-match" : ""}`} key={`${option.id ?? option.name}-${index}`}>
+              <div><span>{option.name}</span>{matchesGoal && <b className="goal-match-badge">目標一致</b>}{style === "blue" && <b>青字</b>}{style === "black" && <b>黒帯</b>}</div>
               <strong>{option.value !== undefined ? `${option.value}${option.unit ?? ""}` : "数値不明"}<small>ランク{option.rank ?? "?"}</small></strong>
             </li>;
           })}</ul> : <p className="no-options">オバロ効果なし</p>}

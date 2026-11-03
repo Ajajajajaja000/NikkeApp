@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { NikkeRecord } from "../src/types";
-import { assessOverload, optionMatchesPriority, overloadRollStyle } from "../src/rules/overload";
+import { assessOverload, effectiveOverloadTargets, optionMatchesPriority, optionMatchesTargets, overloadRollStyle } from "../src/rules/overload";
 import { overloadRecommendation } from "../src/data/overloadRecommendations";
 
 describe("overload display and goals", () => {
@@ -36,5 +36,13 @@ describe("overload display and goals", () => {
     expect(result.blueLines).toBe(1);
     expect(result.goals.find((goal) => goal.effect === "攻撃力増加")?.current).toBe(1);
     expect(result.nextAction).toContain("有利コードダメージ");
+  });
+
+  it("手動目標を公開推奨より優先し、装備ラインとの一致を判定する", () => {
+    const record: NikkeRecord = { owned: true, favorite: true, target: { overloadGoals: [{ effect: "有利コードダメージ増加", target: "2枠" }] } };
+    const targets = effectiveOverloadTargets(record, overloadRecommendation(19, "マリアン：クイーン"));
+    expect(targets).toEqual([{ effect: "有利コードダメージ増加", target: "2枠" }]);
+    expect(optionMatchesTargets("有利コードダメージ増加", targets)).toBe(true);
+    expect(optionMatchesTargets("攻撃力増加", targets)).toBe(false);
   });
 });

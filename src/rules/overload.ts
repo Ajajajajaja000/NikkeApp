@@ -1,4 +1,4 @@
-import type { GearSlot, NikkeRecord } from "../types";
+import type { GearSlot, NikkeRecord, OverloadTarget } from "../types";
 import type { OverloadRecommendation } from "../data/overloadRecommendations";
 import { effectiveGear } from "./growth";
 
@@ -20,7 +20,7 @@ export function optionMatchesPriority(optionName: string, priorityEffect: string
   return option.length >= 3 && (priority.includes(option) || option.includes(priority));
 }
 
-function expandPriorityEffect(effect: string) {
+export function expandPriorityEffect(effect: string) {
   const parts = effect.split(/[・、]/).filter(Boolean);
   return parts.map((part, index) => {
     if (part === "ダメージ" && parts[index - 1]?.startsWith("クリティカル")) return "クリティカルダメージ";
@@ -43,11 +43,21 @@ export interface OverloadGoalRow {
   met: boolean;
 }
 
-export function assessOverload(record: NikkeRecord, recommendation: OverloadRecommendation | undefined) {
+export function effectiveOverloadTargets(record: NikkeRecord, recommendation: OverloadRecommendation | undefined): OverloadTarget[] {
+  return record.target?.overloadGoals ?? recommendation?.priorities.map(({ effect, target }) => ({ effect, target })) ?? [];
+}
+
+export function optionMatchesTargets(optionName: string, targets: OverloadTarget[]) {
+  return targets.some((target) => !/避ける|不要/.test(target.target)
+    && expandPriorityEffect(target.effect).some((effect) => optionMatchesPriority(optionName, effect)));
+}
+
+export function assessOverload(record: NikkeRecord, recommendationOrTargets: OverloadRecommendation | OverloadTarget[] | undefined) {
   const slots: GearSlot[] = ["head", "chest", "arms", "legs"];
   const gear = slots.map((slot) => effectiveGear(record, slot));
   const options = gear.flatMap((item) => item.options ?? []);
-  const goals: OverloadGoalRow[] = recommendation ? recommendation.priorities.flatMap((priority) => {
+  const priorities = Array.isArray(recommendationOrTargets) ? recommendationOrTargets : effectiveOverloadTargets(record, recommendationOrTargets);
+  const goals: OverloadGoalRow[] = priorities.flatMap((priority) => {
     const avoid = /避ける|不要/.test(priority.target);
     const optional = /残り|次点|候補/.test(priority.target);
     const minimum = minimumFromTarget(priority.target);
@@ -57,7 +67,7 @@ export function assessOverload(record: NikkeRecord, recommendation: OverloadReco
       const met = avoid ? current === 0 : minimum !== undefined ? current >= minimum : current > 0;
       return { effect, target: priority.target, current, minimum, kind, met };
     });
-  }) : [];
+  });
   const matchedLines = options.filter((option) => goals.some((goal) => goal.kind !== "avoid" && optionMatchesPriority(option.name, goal.effect))).length;
   const blackLines = options.filter((option) => overloadRollStyle(option.rank) === "black").length;
   const blueLines = options.filter((option) => overloadRollStyle(option.rank) === "blue").length;

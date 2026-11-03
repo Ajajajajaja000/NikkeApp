@@ -21,7 +21,7 @@ export const sources = [
     title: "Nikkers — キャラ別ビルド",
     url: "https://nikkers.cc/api",
     checked: "2026-11-03",
-    note: "公開APIのキャラ別notesをresourceIdで照合し、60体分のオバロ推奨を静的収録。新キャラ追加・既存ビルド変更時に推奨データだけを確認・更新する。実行時APIとしては使わず、未確認キャラへ推測で流用しない。",
+    note: "公開APIで数値を確認できたskill target 195体分と、キャラ別notesから確認できた60体分のオバロ・キューブ推奨をresourceIdで静的収録。新キャラ追加・既存ビルド変更時だけ低頻度で確認する。実行時APIとしては使わず、未確認キャラへ推測で流用しない。",
   },
   {
     title: "Prydwen — Builds / Overload Gear",

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateCoreDust, coreDustForLevel, growthShortages } from "../src/rules/growth";
+import { growthRecommendation } from "../src/data/growthRecommendations";
 
 describe("core dust calculator", () => {
   it("レベル帯の境界で必要数を切り替える", () => {
@@ -19,7 +20,7 @@ describe("core dust calculator", () => {
 });
 
 describe("growth shortages", () => {
-  it("廃止した装備Tier・オバロ部位数を不足項目に出さない", () => {
+  it("廃止した装備Tier・オバロ部位数・キューブLvを不足項目に出さない", () => {
     const shortages = growthShortages({
       owned: true,
       favorite: true,
@@ -27,5 +28,12 @@ describe("growth shortages", () => {
       imported: { skills: [7, 7, 7], cube: { name: "テスト", level: 7 }, fetchedAt: "2026-11-03T00:00:00Z", source: "test" },
     });
     expect(shortages).toEqual([]);
+  });
+
+  it("resourceIdごとの公開推奨スキル値を不足判定に使う", () => {
+    const recommendation = growthRecommendation(16);
+    expect(recommendation?.skills).toEqual([10, 10, 10]);
+    const shortages = growthShortages({ owned: true, favorite: true, imported: { skills: [7, 10, 10], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } }, recommendation?.skills);
+    expect(shortages).toEqual(["スキル不足 3 / 0 / 0"]);
   });
 });
