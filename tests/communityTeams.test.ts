@@ -46,4 +46,15 @@ describe("communityTeams", () => {
       "gamewith-all-round", "gamewith-pilgrim-os", "prydwen-story-team-38",
     ]);
   });
+
+  it("企業別トライブタワー4編成を掲載形のまま収録する", () => {
+    const tribeTeams = communityTeams.filter((item) => item.purpose === "tribe");
+    expect(tribeTeams.map((item) => item.id)).toEqual([
+      "tribe-elysion", "tribe-missilis", "tribe-tetra", "tribe-pilgrim",
+    ]);
+    expect(tribeTeams.find((item) => item.id === "tribe-missilis")?.members.map((member) => member.resourceId))
+      .toEqual([451, 82, 450, 18, 162]);
+    expect(tribeTeams.find((item) => item.id === "tribe-pilgrim")?.members.map((member) => member.resourceId))
+      .toEqual([17, 330, 16, 471, 162]);
+  });
 });

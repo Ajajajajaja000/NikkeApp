@@ -1,7 +1,8 @@
-export type CommunityPurpose = "campaign" | "kraken" | "mirror" | "indivilla" | "ultra" | "harvester";
+export type CommunityPurpose = "campaign" | "tribe" | "kraken" | "mirror" | "indivilla" | "ultra" | "harvester";
 
 export const communityPurposes: Array<{ id: CommunityPurpose; label: string }> = [
-  { id: "campaign", label: "キャンペーン" }, { id: "kraken", label: "異常個体：クラーケン" },
+  { id: "campaign", label: "キャンペーン" }, { id: "tribe", label: "トライブタワー" },
+  { id: "kraken", label: "異常個体：クラーケン" },
   { id: "mirror", label: "異常個体：ミラーコンテナ" }, { id: "indivilla", label: "異常個体：インディビリア" },
   { id: "ultra", label: "異常個体：ウルトラ" }, { id: "harvester", label: "異常個体：ハーベスター" },
 ];
@@ -17,6 +18,7 @@ export interface CommunityTeam {
 const checked = "2026-11-03";
 const prydwenSource = { title: "Prydwen — Story Meta Teams", url: "https://www.prydwen.gg/nikke/guides/meta-teams", updated: "2026-11-02", checked };
 const gameWithSource = { title: "GameWith — 最強パーティー編成まとめ", url: "https://gamewith.jp/nikke/article/show/376374", updated: "2026-11-03", checked };
+const tribeTowerSource = { title: "GameWith — トライブタワー企業別おすすめ編成", url: "https://gamewith.jp/nikke/article/show/370073", updated: "2026-10-27", checked };
 const anomalySource = (title: string, path: string) => ({ title: `NIKKE.GG — ${title}`, url: `https://nikke.gg/${path}/`, updated: "2026-10-12", checked });
 const gameWithBossSource = (title: string, article: string, updated: string) => ({ title: `GameWith — ${title}`, url: `https://gamewith.jp/nikke/article/show/${article}`, updated, checked });
 
@@ -39,6 +41,30 @@ export const communityTeams: CommunityTeam[] = [
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }],
     playStyle: "手動推奨", orderNote: "Prydwenの掲載順です。", summary: "戦力差45〜50%帯のGod Comp #1として掲載された、超高難度向け編成です。",
     notes: ["高水準の育成、オバロ、有利属性、手動操作を前提とします。", "ステージごとの敵配置とバーストタイミングを確認してください。"], substitutions: [], verification: "Prydwenの完成形を採用。GameWithの最新灼熱編成と主要4枠が一致。", source: prydwenSource,
+  },
+  {
+    id: "tribe-elysion", purpose: "tribe", title: "エリシオンタワー編成",
+    members: [{ resourceId: 43, name: "D：キラーワイフ" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }, { resourceId: 355, name: "アンカー：イノセントメイド" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 352, name: "ヘルム" }],
+    playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "火力支援と回復を両立し、ラピ：レッドフードを主力にするエリシオン限定編成です。",
+    notes: ["エリシオン所属と、エリシオンに対応するオーバースペックだけで編成します。", "高戦力差やボス階ではヘルムの宝もの解放、手動操作、弱点属性への入れ替えを検討してください。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenの2026年11月更新例でもラピ：レッドフード、メイド支援、ヘルムを中核として確認。Loot & Waifusでも同じ役割構成を確認。", source: tribeTowerSource,
+  },
+  {
+    id: "tribe-missilis", purpose: "tribe", title: "ミシリスタワー編成",
+    members: [{ resourceId: 451, name: "ティア" }, { resourceId: 82, name: "リター" }, { resourceId: 450, name: "ナガ" }, { resourceId: 18, name: "ネオン：ビジョン・アイ" }, { resourceId: 162, name: "ミハラ：ボンディングチェーン" }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "ティアとナガの回復・遮蔽物支援に、オーバースペック火力を組み合わせるミシリス限定編成です。",
+    notes: ["ミシリス所属と、ミシリスに対応するオーバースペックだけで編成します。", "Prydwenは雑魚戦でラプラス：アルティメットヒーローと宝ものフローラを使う別の最新形も掲載しています。ステージ構成で使い分けてください。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenでもリターとナガを中核として確認。Loot & Waifusの2026年7月例ではリター、ナガ、ネオン：ビジョン・アイ、ミハラ：ボンディングチェーンの4人が一致。", source: tribeTowerSource,
+  },
+  {
+    id: "tribe-tetra", purpose: "tribe", title: "テトラタワー編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 600, name: "ミント" }, { resourceId: 601, name: "プリカ" }, { resourceId: 191, name: "アリス" }, { resourceId: 570, name: "アークレンジャー・ブラック" }],
+    playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "ミントとプリカのセット支援で、アリスとアークレンジャー・ブラックの火力を伸ばすテトラ限定編成です。",
+    notes: ["テトラ所属と、テトラに対応するオーバースペックだけで編成します。", "風圧弱点の属性バリア階では、掲載元が示すブラン＋ノワールなどへの変更を検討してください。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenの2026年11月更新例でもアニス：スター、ミント、プリカ、アークレンジャー・ブラックを中核として確認。Loot & Waifusでもアニス：スターとアリスの採用を確認。", source: tribeTowerSource,
+  },
+  {
+    id: "tribe-pilgrim", purpose: "tribe", title: "ピルグリム＆オーバースペックタワー編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 162, name: "ミハラ：ボンディングチェーン" }],
+    playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "アニス：スターとクラウンの支援で3人のアタッカーを強化する、ピルグリム／オーバースペック限定編成です。",
+    notes: ["ピルグリムとオーバースペックだけで編成します。", "属性バリアやボスに応じて、掲載元のリトルマーメイド、ナユタ、ネオン：ビジョン・アイ、リバーレリオなどの代用候補を確認してください。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenでもアニス：スターとラピ：レッドフードを軸にした全属性対応方針を確認。Loot & Waifusではアニス：スター、クラウン、ラピ：レッドフード、スノーホワイト：ヘビーアームズの4人が一致し、ミハラを灼熱枠に掲載。", source: tribeTowerSource,
   },
   {
     id: "kraken-nayuta", purpose: "kraken", title: "ナユタ・リバーレリオ編成",

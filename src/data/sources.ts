@@ -72,6 +72,24 @@ export const sources = [
     note: "2026-11-02更新。戦力差45〜50%帯のキャンペーン完成編成と運用説明を確認。アプリ側で欠員補完や独自編成は行わない。",
   },
   {
+    title: "Prydwen — Tribe Towers",
+    url: "https://www.prydwen.gg/nikke/guides/tribe-tower-teams",
+    checked: "2026-11-03",
+    note: "2026-11-02更新。企業別4タワーの最新中核メンバー、属性バリアへの対応、代用候補をGameWith掲載編成の相互確認に使用。",
+  },
+  {
+    title: "GameWith — トライブタワー企業別おすすめ編成",
+    url: "https://gamewith.jp/nikke/article/show/370073",
+    checked: "2026-11-03",
+    note: "2026-10-27更新。企業別4タワーの完成5人編成を掲載元の順序のまま収録。PrydwenとLoot & Waifusで中核・役割を相互確認。",
+  },
+  {
+    title: "Loot & Waifus — Manufacturer Tower Teams",
+    url: "https://lootandwaifus.com/teams/nikke-manufacturer-tower-teams/",
+    checked: "2026-11-03",
+    note: "2026-07-12更新。企業別タワーの中核メンバー、役割、属性別代用候補の補助照合に使用。単独の最新完成編成根拠にはしない。",
+  },
+  {
     title: "平方ワールド — キャンペーン攻略ニケ",
     url: "https://heihouworld.com/nikke-campaign-kyoukyara/",
     checked: "2026-11-03",
