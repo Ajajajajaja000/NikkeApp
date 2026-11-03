@@ -6,6 +6,10 @@ export function effectiveLevel(record: NikkeRecord | undefined): number {
   return record?.imported?.level ?? record?.level ?? 1;
 }
 
+export function effectiveCombatPower(record: NikkeRecord | undefined): number | undefined {
+  return record?.imported?.combatPower ?? record?.combatPower;
+}
+
 export function effectiveLimitBreak(record: NikkeRecord | undefined): number {
   return record?.imported?.limitBreak ?? record?.limitBreak ?? 0;
 }

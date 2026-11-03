@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { communityPurposes, communityTeams, type CommunityPurpose, type CommunityTeamMember } from "../data/communityTeams";
 import type { CharacterSummary, NikkeRecord } from "../types";
+import { burstLabel, elementLabel } from "../presentation/labels";
 
 interface Props {
   catalog: CharacterSummary[];
@@ -62,7 +63,7 @@ export function TeamsPage({ catalog, records }: Props) {
               <span className="position">{index + 1}</span>
               <div className="team-avatar">{character?.icon ? <img src={character.icon} alt="" loading="lazy" /> : member.name.slice(0, 1)}</div>
               <strong title={character?.name ?? member.name}>{character?.name ?? member.name}</strong>
-              <small>{character ? `B${character.bursts.join("/")} · ${character.element}` : "図鑑データ確認中"}</small>
+              <small>{character ? `${burstLabel(character.bursts)} · ${elementLabel(character.element)}` : "図鑑データ確認中"}</small>
               <span className={`ownership ${owned ? "owned" : "unowned"}`}>{owned ? "所持" : "未所持"}</span>
               {member.treasure && <span className={`treasure-status ${treasure ? "ready" : "needed"}`}>{treasure ? "宝もの解放済" : owned ? "宝もの未解放" : "宝もの必要"}</span>}
             </div>;
@@ -80,6 +81,7 @@ export function TeamsPage({ catalog, records }: Props) {
           <ul>{entry.team.substitutions.map((item) => <li key={item}>{item}</li>)}</ul>
         </div>}
         <div className="community-source">
+          <span>掲載元更新日：{entry.team.source.updated.replaceAll("-", "/")}</span>
           <span>確認日：{entry.team.source.checked.replaceAll("-", "/")}</span>
           <a href={entry.team.source.url} target="_blank" rel="noreferrer">{entry.team.source.title}で攻略を確認 ↗</a>
         </div>

@@ -1,5 +1,6 @@
 import type { BurstStage, CharacterSummary, NikkeRecord } from "../types";
 import { compareByReleaseOrder } from "../data/releaseOrder";
+import { effectiveCombatPower } from "./growth";
 
 export interface RosterFilters {
   query: string;
@@ -8,6 +9,7 @@ export interface RosterFilters {
   corporation: string;
   weapon: string;
   burst: "all" | BurstStage;
+  sort: "release" | "combat";
 }
 
 export function filterCharacters(characters: CharacterSummary[], records: Record<string, NikkeRecord>, filters: RosterFilters) {
@@ -20,5 +22,11 @@ export function filterCharacters(characters: CharacterSummary[], records: Record
       && (filters.corporation === "all" || character.corporation === filters.corporation)
       && (filters.weapon === "all" || character.weapon === filters.weapon)
       && (filters.burst === "all" || character.bursts.includes(filters.burst));
-  }).sort((a, b) => compareByReleaseOrder(a.resourceId, b.resourceId));
+  }).sort((a, b) => {
+    if (filters.sort === "combat") {
+      const difference = (effectiveCombatPower(records[b.id]) ?? -1) - (effectiveCombatPower(records[a.id]) ?? -1);
+      if (difference !== 0) return difference;
+    }
+    return compareByReleaseOrder(a.resourceId, b.resourceId);
+  });
 }

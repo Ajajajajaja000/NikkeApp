@@ -20,7 +20,7 @@ export default function App() {
   const [syncState, setSyncState] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
   const [focusedNikkeId, setFocusedNikkeId] = useState("");
-  const [nikkeFilters, setNikkeFilters] = useState<NikkeFilters>({ query: "", owned: "all", element: "all", corporation: "all", weapon: "all", burst: "all" });
+  const [nikkeFilters, setNikkeFilters] = useState<NikkeFilters>({ query: "", owned: "all", element: "all", corporation: "all", weapon: "all", burst: "all", sort: "release" });
   const syncing = useRef(false);
   const catalogRequest = useRef<Promise<CharacterSummary[]> | null>(null);
 
@@ -74,7 +74,7 @@ export default function App() {
       const imported = await importBlablaRoster(openid, active.area);
       if (active.lastCount && imported.rows.length < active.lastCount * 0.6) throw new Error("前回より取得件数が大幅に少ないため、データを更新しませんでした。");
       const matches = imported.rows.map((row) => ({ row, character: importCatalog.find((item) => item.resourceId === row.resourceId) })).filter((item) => item.character);
-      if (matches.length < imported.rows.length * 0.8) throw new Error(`図鑑IDとの照合が不足しています（${matches.length}/${imported.rows.length}体）。保存済みデータは変更していません。`);
+      if (matches.length < imported.rows.length * 0.8) throw new Error(`キャラ情報との照合が不足しています（${matches.length}/${imported.rows.length}体）。保存済みデータは変更していません。`);
       setData((current) => {
         const records = { ...current.profile.records };
         for (const { row, character } of matches) if (character) records[character.id] = { ...mergeImportedRecord(records[character.id], row.snapshot), displayName: character.name };

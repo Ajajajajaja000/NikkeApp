@@ -1,6 +1,7 @@
 import type { GearSlot, NikkeRecord, OverloadTarget } from "../types";
 import { effectiveCollection, effectiveCube, effectiveGear, effectiveLevel, effectiveLimitBreak, effectiveSkills } from "../rules/growth";
 import { optionMatchesTargets, overloadRollStyle } from "../rules/overload";
+import { corporationLabel } from "../presentation/labels";
 
 const slots: Array<{ id: GearSlot; label: string }> = [
   { id: "head", label: "頭" },
@@ -25,8 +26,8 @@ export function NikkeStatusSummary({ record, overloadTargets = [] }: { record: N
       <span><small>レベル</small><strong>Lv.{effectiveLevel(record)}</strong></span>
       <span><small>凸・コア</small><strong>{limitBreakLabel(effectiveLimitBreak(record))}</strong></span>
       <span><small>スキル</small><strong>{skills.join(" / ")}</strong></span>
-      <span><small>キューブ</small><strong>{cube.name} Lv.{cube.level}</strong>{cube.id && <small>ID {cube.id}</small>}</span>
-      <span><small>コレクション</small><strong>{collection.rarity} Lv.{collection.level}</strong><small>{collection.treasure ? "宝もの解放済み" : collection.name || "未設定"}{collection.id ? ` · ID ${collection.id}` : ""}</small></span>
+      <span><small>キューブ</small><strong>{cube.name} Lv.{cube.level}</strong></span>
+      <span><small>コレクション</small><strong>{collection.rarity} Lv.{collection.level}</strong><small>{collection.treasure ? "宝もの解放済み" : collection.name || "未設定"}</small></span>
     </div>
 
     <div className="equipment-grid" aria-label="装備・オーバーロード状況">
@@ -34,7 +35,7 @@ export function NikkeStatusSummary({ record, overloadTargets = [] }: { record: N
         const gear = effectiveGear(record, slot.id);
         return <section className={`equipment-card ${gear.overload ? "overloaded" : ""}`} key={slot.id}>
           <div className="equipment-head"><strong>{slot.label}</strong><span>{gear.tier} · Lv.{gear.level}</span>{gear.overload && <b>OL</b>}</div>
-          <small>企業：{gear.corporation || "不明"}</small>
+          <small>企業：{corporationLabel(gear.corporation || "")}</small>
           {gear.options?.length ? <ul className="overload-options">{gear.options.map((option, index) => {
             const style = overloadRollStyle(option.rank);
             const matchesGoal = optionMatchesTargets(option.name, overloadTargets);
