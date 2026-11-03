@@ -21,13 +21,19 @@ export const sources = [
     title: "Nikkers — キャラ別ビルド",
     url: "https://nikkers.cc/api",
     checked: "2026-11-03",
-    note: "公開APIのキャラ別notesをresourceIdで照合し、60体分のオバロ推奨を静的収録。実行時APIとしては使わず、未確認キャラへ推測で流用しない。CORSに依存しない代わりに、サイト側の更新後はアプリ更新が必要。",
+    note: "公開APIのキャラ別notesをresourceIdで照合し、60体分のオバロ推奨を静的収録。新キャラ追加・既存ビルド変更時に推奨データだけを確認・更新する。実行時APIとしては使わず、未確認キャラへ推測で流用しない。",
   },
   {
     title: "Prydwen — Builds / Overload Gear",
     url: "https://www.prydwen.gg/nikke/builds",
     checked: "2026-11-03",
     note: "キャラ別ビルドの手動相互確認候補。公開APIと再配布許諾は未確認で、自動取得はCloudflareのHTTP 403となるため、実行時取得や回避は行わない。",
+  },
+  {
+    title: "Prydwen — Overload Gear Rerolling",
+    url: "https://www.prydwen.gg/nikke/guides/overload-gear-reroll",
+    checked: "2026-11-03",
+    note: "オバロ数値の表示区分に使用。ランク12〜14を青字、ランク15を最高値の黒帯として装飾する。",
   },
   {
     title: "NIKKE.GG — Overload Gear Priority",

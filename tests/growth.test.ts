@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateCoreDust, coreDustForLevel } from "../src/rules/growth";
+import { calculateCoreDust, coreDustForLevel, growthShortages } from "../src/rules/growth";
 
 describe("core dust calculator", () => {
   it("レベル帯の境界で必要数を切り替える", () => {
@@ -15,5 +15,17 @@ describe("core dust calculator", () => {
     expect(result.caseHours).toBe(4);
     expect(result.available).toBe(4_200);
     expect(result.shortage).toBe(16_800);
+  });
+});
+
+describe("growth shortages", () => {
+  it("廃止した装備Tier・オバロ部位数を不足項目に出さない", () => {
+    const shortages = growthShortages({
+      owned: true,
+      favorite: true,
+      target: { skills: [7, 7, 7], gearTier: "OL", overloadCount: 4, cubeLevel: 7 },
+      imported: { skills: [7, 7, 7], cube: { name: "テスト", level: 7 }, fetchedAt: "2026-11-03T00:00:00Z", source: "test" },
+    });
+    expect(shortages).toEqual([]);
   });
 });
