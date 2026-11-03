@@ -1,5 +1,5 @@
 const elements: Record<string, string> = {
-  Fire: "火力", Water: "水冷", Wind: "風圧", Iron: "鉄甲", Electric: "電撃", Electronic: "電撃",
+  Fire: "灼熱", Water: "水冷", Wind: "風圧", Iron: "鉄甲", Electric: "電撃", Electronic: "電撃",
 };
 
 const corporations: Record<string, string> = {

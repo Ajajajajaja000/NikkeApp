@@ -32,11 +32,11 @@ export function TeamsPage({ catalog, records }: Props) {
 
     <article className="panel community-policy">
       <h2>この画面について</h2>
-      <p>アプリが独自にメンバーを組み合わせることはありません。BlablaLinkの取込値は、掲載編成を組めるかの確認にだけ使います。</p>
+      <p>複数の攻略元から更新日・根拠・用途を比較して採用しています。アプリが独自にメンバーを組み合わせることはなく、BlablaLinkの取込値は掲載編成を組めるかの確認にだけ使います。</p>
       <div className="policy-points">
         <span>攻略元の5人を固定表示</span>
         <span>未所持も目標として表示</span>
-        <span>出典と確認日を明記</span>
+        <span>更新日・出典・確認日を明記</span>
       </div>
     </article>
 

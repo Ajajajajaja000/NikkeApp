@@ -48,6 +48,12 @@ export const sources = [
     note: "日本語の手動相互確認候補。トーブの装弾数・攻撃力・有利コードの理由を確認し、該当キャラの補助出典として表示。掲載順を厳密な優先順位とは扱わない。",
   },
   {
+    title: "GameWith — 最強パーティー編成まとめ",
+    url: "https://gamewith.jp/nikke/article/show/376374",
+    checked: "2026-11-03",
+    note: "2026-11-03更新の完成5人編成から、マリアン：クイーンを含む最新の汎用編成2例を確認。キャンペーン専用・フルオート保証とは扱わない。",
+  },
+  {
     title: "ニケハブ — オーバーロードシミュレーター",
     url: "https://nikkehub.com/ja/tools/overload",
     checked: "2026-11-03",
@@ -60,10 +66,10 @@ export const sources = [
     note: "異常個体5ボスの属性、有利・不利属性と一般的注意点の確認に使用。",
   },
   {
-    title: "Prydwen — Teams Database",
-    url: "https://www.prydwen.gg/nikke/teams-database",
+    title: "Prydwen — Story Meta Teams",
+    url: "https://www.prydwen.gg/nikke/guides/meta-teams",
     checked: "2026-11-03",
-    note: "キャンペーン用の完成編成、運用説明、掲載元が示す代替例を確認。アプリ側で欠員補完や独自編成は行わない。",
+    note: "2026-11-02更新。戦力差45〜50%帯のキャンペーン完成編成と運用説明を確認。アプリ側で欠員補完や独自編成は行わない。",
   },
   {
     title: "NIKKE.GG — Anomaly Interception Guides",

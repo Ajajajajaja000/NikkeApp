@@ -16,27 +16,28 @@ export interface CommunityTeam {
 
 const checked = "2026-11-03";
 const prydwenSource = { title: "Prydwen — Story Meta Teams", url: "https://www.prydwen.gg/nikke/guides/meta-teams", updated: "2026-11-02", checked };
+const gameWithSource = { title: "GameWith — 最強パーティー編成まとめ", url: "https://gamewith.jp/nikke/article/show/376374", updated: "2026-11-03", checked };
 const anomalySource = (title: string, path: string) => ({ title: `NIKKE.GG — ${title}`, url: `https://nikke.gg/${path}/`, updated: "2026-10-12", checked });
 
 // 公開攻略に掲載された完成編成だけを収録し、アプリ側で別編成へ組み替えない。
 export const communityTeams: CommunityTeam[] = [
   {
-    id: "prydwen-story-team-30", purpose: "campaign", title: "編成30 — オート向け",
-    members: [{ resourceId: 82, name: "リター" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 355, name: "アンカー：イノセントメイド" }],
-    playStyle: "フルオート候補", orderNote: "Prydwenの掲載順です。", summary: "現行Story Meta Teamsに掲載された、ラピ：レッドフード軸のオート向け編成です。",
-    notes: ["高難度では遮蔽物や敵配置によって手動操作が必要になる場合があります。"], substitutions: [], source: prydwenSource,
+    id: "gamewith-all-round", purpose: "campaign", title: "最新オールラウンド編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 223, name: "ナユタ" }, { resourceId: 19, name: "マリアン：クイーン" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 330, name: "クラウン" }],
+    playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "高火力と回復のバランスを取った、2026年11月3日更新の汎用完成編成です。",
+    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "マリアン：クイーンまで反映された最新の掲載例です。"], substitutions: [], source: gameWithSource,
   },
   {
-    id: "prydwen-story-team-31", purpose: "campaign", title: "編成31 — オート向け（リターなし）",
-    members: [{ resourceId: 513, name: "リトルマーメイド" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 355, name: "アンカー：イノセントメイド" }],
-    playStyle: "フルオート候補", orderNote: "Prydwenの掲載順です。", summary: "リトルマーメイドを採用した、リターなしのオート向け掲載編成です。",
-    notes: ["高難度では遮蔽物や敵配置によって手動操作が必要になる場合があります。"], substitutions: [], source: prydwenSource,
+    id: "gamewith-pilgrim-os", purpose: "campaign", title: "最新ピルグリム＆オーバースペック編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 223, name: "ナユタ" }, { resourceId: 19, name: "マリアン：クイーン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 330, name: "クラウン" }],
+    playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "クラウンの防御・火力支援と強力なアタッカーを組み合わせた、2026年11月3日更新の完成編成です。",
+    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "雑魚処理と最終ボスの両方を意識した掲載例です。"], substitutions: [], source: gameWithSource,
   },
   {
-    id: "prydwen-story-team-32", purpose: "campaign", title: "編成32 — クラウン・ナガ編成",
-    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 450, name: "ナガ" }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }],
-    playStyle: "手動推奨", orderNote: "Prydwenの掲載順です。", summary: "クラウンとナガの支援を使う高火力の掲載編成です。",
-    notes: ["掲載元では高ダメージ編成として扱われており、手動でのバースト管理を推奨します。"], substitutions: [], source: prydwenSource,
+    id: "prydwen-story-team-38", purpose: "campaign", title: "高戦力差：宝ものヘルム編成",
+    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }],
+    playStyle: "手動推奨", orderNote: "Prydwenの掲載順です。", summary: "戦力差45〜50%帯のGod Comp #1として掲載された、超高難度向け編成です。",
+    notes: ["高水準の育成、オバロ、有利属性、手動操作を前提とします。", "ステージごとの敵配置とバーストタイミングを確認してください。"], substitutions: [], source: prydwenSource,
   },
   {
     id: "kraken-nayuta", purpose: "kraken", title: "ナユタ・リバーレリオ編成",
