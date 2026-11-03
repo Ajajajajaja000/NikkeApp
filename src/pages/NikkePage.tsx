@@ -61,6 +61,7 @@ export function NikkePage({ catalog, records, filters, initialOpenId, onFiltersC
   useLayoutEffect(() => {
     const anchor = scrollAnchor.current;
     if (!anchor) return;
+    const detailLoading = detailState?.id === openId && !detailState.error;
     const restore = () => {
       const element = document.getElementById(`nikke-${anchor.id}`);
       if (element) window.scrollBy({ top: element.getBoundingClientRect().top - anchor.top, behavior: "auto" });
@@ -71,11 +72,14 @@ export function NikkePage({ catalog, records, filters, initialOpenId, onFiltersC
     let secondFrame = 0;
     const firstFrame = requestAnimationFrame(() => {
       restore();
-      secondFrame = requestAnimationFrame(restore);
+      secondFrame = requestAnimationFrame(() => {
+        restore();
+        // API詳細の取得中は、完了後の再描画でも同じ位置を復元できるよう基準を保持する。
+        if (!detailLoading && scrollAnchor.current === anchor) scrollAnchor.current = null;
+      });
     });
-    scrollAnchor.current = null;
     return () => { cancelAnimationFrame(firstFrame); cancelAnimationFrame(secondFrame); };
-  }, [openId]);
+  }, [openId, detailState, details]);
   useEffect(() => {
     if (!focusedCharacter) return;
     setOpenId(focusedCharacter.id);
