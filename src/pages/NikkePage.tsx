@@ -61,9 +61,20 @@ export function NikkePage({ catalog, records, filters, initialOpenId, onFiltersC
   useLayoutEffect(() => {
     const anchor = scrollAnchor.current;
     if (!anchor) return;
-    const element = document.getElementById(`nikke-${anchor.id}`);
-    if (element) window.scrollBy({ top: element.getBoundingClientRect().top - anchor.top, behavior: "auto" });
+    const restore = () => {
+      const element = document.getElementById(`nikke-${anchor.id}`);
+      if (element) window.scrollBy({ top: element.getBoundingClientRect().top - anchor.top, behavior: "auto" });
+    };
+    // SafariやChromiumのスクロールアンカー処理がDOM更新後に走る場合があるため、
+    // レイアウト直後に加えて次の描画フレームでも同じカード位置を補正する。
+    restore();
+    let secondFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      restore();
+      secondFrame = requestAnimationFrame(restore);
+    });
     scrollAnchor.current = null;
+    return () => { cancelAnimationFrame(firstFrame); cancelAnimationFrame(secondFrame); };
   }, [openId]);
   useEffect(() => {
     if (!focusedCharacter) return;
