@@ -5,11 +5,11 @@ import { parseRosterPayload } from "../src/api/nikkeApi";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("BlablaLink詳細同期", () => {
-  it("72時間後に自動同期し、失敗後6時間は再試行しない", () => {
+  it("1週間後に自動同期し、失敗後6時間は再試行しない", () => {
     const base = createConnection("public-id");
     const now = Date.parse("2026-11-03T12:00:00Z");
-    expect(shouldAutoSync({ ...base, lastSuccessAt: "2026-10-31T11:59:59Z" }, now)).toBe(true);
-    expect(shouldAutoSync({ ...base, lastSuccessAt: "2026-11-01T12:00:00Z" }, now)).toBe(false);
+    expect(shouldAutoSync({ ...base, lastSuccessAt: "2026-10-27T11:59:59Z" }, now)).toBe(true);
+    expect(shouldAutoSync({ ...base, lastSuccessAt: "2026-10-27T12:00:01Z" }, now)).toBe(false);
     expect(shouldAutoSync({ ...base, lastAttemptAt: "2026-11-03T10:00:00Z", lastError: "502" }, now)).toBe(false);
   });
 
@@ -18,6 +18,13 @@ describe("BlablaLink詳細同期", () => {
     vi.stubGlobal("localStorage", { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value), removeItem: (key: string) => values.delete(key) });
     saveConnection(createConnection("public-openid"));
     expect(loadConnection()?.openid).toBe("public-openid");
+    expect(loadConnection()?.intervalHours).toBe(168);
+  });
+
+  it("旧版の3日設定を読み込んでも1週間へ更新する", () => {
+    const values = new Map<string, string>([["nikke-compass:blabla-connection", JSON.stringify({ version: 1, openid: "old-openid", autoSync: true, intervalHours: 72 })]]);
+    vi.stubGlobal("localStorage", { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value), removeItem: (key: string) => values.delete(key) });
+    expect(loadConnection()?.intervalHours).toBe(168);
   });
 
   it("初回取り込み失敗だけが残った接続を入力前の状態へ戻す", () => {
