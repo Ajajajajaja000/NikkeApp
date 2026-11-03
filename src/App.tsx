@@ -16,33 +16,37 @@ export default function App() {
   const [remoteCatalog, setRemoteCatalog] = useState<CharacterSummary[]>([]);
   const [catalogStatus, setCatalogStatus] = useState("APIへ接続しています…");
   const [catalogLoading, setCatalogLoading] = useState(false);
-  const [refreshTick, setRefreshTick] = useState(0);
   const [connection, setConnectionState] = useState<BlablaConnection | null>(() => loadConnection());
   const [syncState, setSyncState] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
   const syncing = useRef(false);
+  const catalogRequest = useRef<Promise<CharacterSummary[]> | null>(null);
 
   const setConnection = useCallback((next: BlablaConnection | null) => {
     setConnectionState(next);
     if (next) saveConnection(next); else clearConnection();
   }, []);
 
-  const refresh = useCallback(() => setRefreshTick((value) => value + 1), []);
-  useEffect(() => {
-    const controller = new AbortController();
+  const loadCatalog = useCallback((): Promise<CharacterSummary[]> => {
+    if (catalogRequest.current) return catalogRequest.current;
     setCatalogLoading(true);
     setCatalogStatus("APIへ接続しています…");
-    fetchCatalog(controller.signal).then((characters) => {
+    const request = fetchCatalog().then((characters) => {
       setRemoteCatalog(characters);
       const fetchedAt = new Date().toISOString();
       setData((current) => ({ ...current, catalogMeta: { fetchedAt, source: "非公式NIKKE API", count: characters.length } }));
       setCatalogStatus(`非公式NIKKE APIから${characters.length}体を取得しました。`);
+      return characters;
     }).catch((error) => {
-      if (error instanceof DOMException && error.name === "AbortError") return;
       setCatalogStatus(`APIに接続できません。保存済み記録と内蔵最小データで継続します。${error instanceof Error ? `（${error.message}）` : ""}`);
-    }).finally(() => setCatalogLoading(false));
-    return () => controller.abort();
-  }, [refreshTick, setData]);
+      throw error;
+    }).finally(() => { catalogRequest.current = null; setCatalogLoading(false); });
+    catalogRequest.current = request;
+    return request;
+  }, [setData]);
+
+  const refresh = useCallback(() => { void loadCatalog().catch(() => undefined); }, [loadCatalog]);
+  useEffect(() => { void loadCatalog().catch(() => undefined); }, [loadCatalog]);
 
   const catalog = useMemo(() => {
     const base = remoteCatalog.length ? remoteCatalog : fallbackCharacters;
@@ -53,20 +57,21 @@ export default function App() {
 
   const syncBlabla = useCallback(async (openid = connection?.openid, baseConnection = connection) => {
     if (!openid || syncing.current) return false;
-    if (remoteCatalog.length === 0) {
-      setSyncState("キャラ図鑑の取得が完了していないため取り込めません。通信状態を確認して、マスターデータを手動更新してください。");
-      return false;
-    }
     syncing.current = true;
     setIsSyncing(true);
     const attemptedAt = new Date().toISOString();
     const active = baseConnection ?? createConnection(openid);
     setConnection({ ...active, openid, lastAttemptAt: attemptedAt });
-    setSyncState("BlablaLinkから詳細データを取得中…");
     try {
+      let importCatalog = remoteCatalog;
+      if (importCatalog.length === 0) {
+        setSyncState("先にキャラのマスターデータを取得しています…");
+        importCatalog = await loadCatalog();
+      }
+      setSyncState("BlablaLinkから詳細データを取得中…");
       const imported = await importBlablaRoster(openid, active.area);
       if (active.lastCount && imported.rows.length < active.lastCount * 0.6) throw new Error("前回より取得件数が大幅に少ないため、データを更新しませんでした。");
-      const matches = imported.rows.map((row) => ({ row, character: remoteCatalog.find((item) => item.resourceId === row.resourceId) })).filter((item) => item.character);
+      const matches = imported.rows.map((row) => ({ row, character: importCatalog.find((item) => item.resourceId === row.resourceId) })).filter((item) => item.character);
       if (matches.length < imported.rows.length * 0.8) throw new Error(`図鑑IDとの照合が不足しています（${matches.length}/${imported.rows.length}体）。保存済みデータは変更していません。`);
       setData((current) => {
         const records = { ...current.profile.records };
@@ -83,7 +88,7 @@ export default function App() {
       setSyncState(message);
       return false;
     } finally { syncing.current = false; setIsSyncing(false); }
-  }, [connection, remoteCatalog, setConnection, setData]);
+  }, [connection, loadCatalog, remoteCatalog, setConnection, setData]);
 
   const connectBlabla = useCallback(async (link: string) => {
     if (syncing.current) return;

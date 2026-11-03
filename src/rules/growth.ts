@@ -49,14 +49,12 @@ export function calculateCoreDust(state: CoreDustState) {
   return { required, caseHours, available, shortage, days };
 }
 
-export function growthShortages(record: NikkeRecord): string[] {
-  const target = record.target;
-  if (!target) return [];
+export function growthShortages(record: NikkeRecord, recommendedSkills?: [number, number, number]): string[] {
+  const targetSkills = recommendedSkills ?? record.target?.skills;
+  if (!targetSkills) return [];
   const shortages: string[] = [];
   const skills = effectiveSkills(record);
-  const skillGap = target.skills.map((value, index) => Math.max(0, value - skills[index]));
+  const skillGap = targetSkills.map((value, index) => Math.max(0, value - skills[index]));
   if (skillGap.some(Boolean)) shortages.push(`スキル不足 ${skillGap.join(" / ")}`);
-  const cubeLevel = effectiveCube(record).level;
-  if (cubeLevel < target.cubeLevel) shortages.push(`キューブ あと${target.cubeLevel - cubeLevel}Lv`);
   return shortages;
 }

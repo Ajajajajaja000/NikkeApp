@@ -1,6 +1,9 @@
 import type { CharacterSummary, NikkeRecord } from "../types";
 import { effectiveLevel, growthShortages } from "../rules/growth";
 import { NikkeStatusSummary } from "../components/NikkeStatusSummary";
+import { growthRecommendation } from "../data/growthRecommendations";
+import { overloadRecommendation } from "../data/overloadRecommendations";
+import { effectiveOverloadTargets } from "../rules/overload";
 
 interface Props {
   catalog: CharacterSummary[];
@@ -13,7 +16,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
   const owned = catalog.filter((character) => records[character.id]?.owned);
   const favorites = catalog
     .filter((character) => records[character.id]?.favorite)
-    .sort((a, b) => growthShortages(records[b.id]).length - growthShortages(records[a.id]).length);
+    .sort((a, b) => growthShortages(records[b.id], growthRecommendation(b.resourceId)?.skills).length - growthShortages(records[a.id], growthRecommendation(a.resourceId)?.skills).length);
 
   return <section className="page">
     <header className="hero compact">
@@ -26,12 +29,13 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
     {favorites.length === 0 ? <div className="empty-state"><span>◎</span><h3>育成対象はまだありません</h3><p>ニケ一覧で「育成対象にする」を押すと、不足と詳細をここで追跡できます。</p><button className="primary" onClick={goNikkes}>ニケを選ぶ</button></div> :
       <div className="growth-grid">{favorites.map((character, index) => {
         const record = records[character.id];
-        const shortages = record.imported ? growthShortages(record) : ["BlablaLink未取込"];
+        const shortages = record.imported ? growthShortages(record, growthRecommendation(character.resourceId)?.skills) : ["BlablaLink未取込"];
+        const overloadTargets = effectiveOverloadTargets(record, overloadRecommendation(character.resourceId, character.name));
         return <article className="growth-card" key={character.id}>
           <div className="rank">{String(index + 1).padStart(2, "0")}</div>
           <div><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {character.element} · B{character.bursts.join("/") || "?"}</p></div>
           <div className="shortage-list">{shortages.length ? shortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}</div>
-          <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} /></details>
+          <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} overloadTargets={overloadTargets} /></details>
         </article>;
       })}</div>}
   </section>;
