@@ -5,13 +5,14 @@ interface Props {
   catalog: CharacterSummary[];
   records: Record<string, NikkeRecord>;
   coreDust: CoreDustState;
+  lastBlablaImport?: string;
   onCoreDustChange: (value: CoreDustState) => void;
   goNikkes: () => void;
 }
 
 const number = new Intl.NumberFormat("ja-JP");
 
-export function HomePage({ catalog, records, coreDust, onCoreDustChange, goNikkes }: Props) {
+export function HomePage({ catalog, records, coreDust, lastBlablaImport, onCoreDustChange, goNikkes }: Props) {
   const owned = catalog.filter((character) => records[character.id]?.owned);
   const favorites = catalog.filter((character) => records[character.id]?.favorite).sort((a, b) => growthShortages(records[b.id]).length - growthShortages(records[a.id]).length);
   const calc = calculateCoreDust(coreDust);
@@ -23,6 +24,7 @@ export function HomePage({ catalog, records, coreDust, onCoreDustChange, goNikke
       <div><p className="eyebrow">LOCAL COMMAND CENTER</p><h1>育成ダッシュボード</h1><p>この端末だけに保存。通信が止まっても記録は残ります。</p></div>
       <div className="hero-stat"><strong>{owned.length}</strong><span>所持</span></div>
     </header>
+    <p className="blabla-date">BlablaLinkからデータ取り込み日時：{lastBlablaImport ? new Date(lastBlablaImport).toLocaleString("ja-JP") : "未取得"}</p>
 
     <div className="section-heading"><div><p className="eyebrow">PRIORITY</p><h2>育成対象</h2></div><button className="text-button" onClick={goNikkes}>ニケ一覧へ</button></div>
     {favorites.length === 0 ? <div className="empty-state"><span>☆</span><h3>育成対象はまだありません</h3><p>ニケ一覧で「育成」をオンにすると、不足をここで追跡できます。</p><button className="primary" onClick={goNikkes}>ニケを選ぶ</button></div> :

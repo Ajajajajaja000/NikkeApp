@@ -1,4 +1,4 @@
-import type { CoreDustState, NikkeRecord } from "../types";
+import type { CollectionRecord, CoreDustState, CubeRecord, GearRecord, GearSlot, NikkeRecord } from "../types";
 
 export function effectiveLevel(record: NikkeRecord | undefined): number {
   return record?.level ?? record?.imported?.level ?? 1;
@@ -10,6 +10,18 @@ export function effectiveLimitBreak(record: NikkeRecord | undefined): number {
 
 export function effectiveSkills(record: NikkeRecord | undefined): [number, number, number] {
   return record?.skills ?? record?.imported?.skills ?? [1, 1, 1];
+}
+
+export function effectiveGear(record: NikkeRecord | undefined, slot: GearSlot): GearRecord {
+  return record?.gear?.[slot] ?? record?.imported?.gear?.[slot] ?? { tier: "未設定", level: 0, overload: false };
+}
+
+export function effectiveCube(record: NikkeRecord | undefined): CubeRecord {
+  return record?.cube ?? record?.imported?.cube ?? { name: "なし", level: 0 };
+}
+
+export function effectiveCollection(record: NikkeRecord | undefined): CollectionRecord {
+  return record?.collection ?? record?.imported?.collection ?? { rarity: "なし", level: 0, treasure: false };
 }
 
 export function coreDustForLevel(targetLevel: number): number {
@@ -44,13 +56,15 @@ export function growthShortages(record: NikkeRecord): string[] {
   const skills = effectiveSkills(record);
   const skillGap = target.skills.map((value, index) => Math.max(0, value - skills[index]));
   if (skillGap.some(Boolean)) shortages.push(`スキル不足 ${skillGap.join(" / ")}`);
-  const overload = Object.values(record.gear ?? {}).filter((gear) => gear.overload).length;
+  const slots: GearSlot[] = ["head", "chest", "arms", "legs"];
+  const gear = slots.map((slot) => effectiveGear(record, slot));
+  const overload = gear.filter((item) => item.overload).length;
   if (overload < target.overloadCount) shortages.push(`オバロ あと${target.overloadCount - overload}部位`);
-  const cubeLevel = record.cube?.level ?? 0;
+  const cubeLevel = effectiveCube(record).level;
   if (cubeLevel < target.cubeLevel) shortages.push(`キューブ あと${target.cubeLevel - cubeLevel}Lv`);
   const tierOrder = ["未設定", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T9企業", "OL"];
   const targetIndex = tierOrder.indexOf(target.gearTier);
-  const underGear = Object.values(record.gear ?? {}).filter((gear) => tierOrder.indexOf(gear.tier) < targetIndex).length;
+  const underGear = gear.filter((item) => tierOrder.indexOf(item.tier) < targetIndex).length;
   if (underGear) shortages.push(`${target.gearTier}未満 ${underGear}部位`);
   return shortages;
 }

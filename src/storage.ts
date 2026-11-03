@@ -20,17 +20,13 @@ export const defaultGear = (): Record<GearSlot, GearRecord> => ({
 export const emptyRecord = (): NikkeRecord => ({
   owned: false,
   favorite: false,
-  skills: [1, 1, 1],
-  gear: defaultGear(),
-  cube: { name: "なし", level: 0 },
-  collection: { rarity: "なし", level: 0, treasure: false },
   target: { skills: [7, 7, 7], gearTier: "T9", overloadCount: 4, cubeLevel: 7 },
 });
 
 const profile = (): LocalProfile => ({ id: "local", name: "この端末", records: {}, savedTeams: [], coreDust: defaultCoreDust() });
 
 export const createDefaultData = (): AppData => ({
-  version: 2,
+  version: 3,
   profile: profile(),
 });
 
@@ -39,12 +35,27 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function validateImport(value: unknown): AppData {
-  if (!isObject(value) || value.version !== 2 || !isObject(value.profile)) {
-    throw new Error("対応していないバックアップ形式です（データバージョン2が必要です）。");
+  if (!isObject(value) || (value.version !== 2 && value.version !== 3) || !isObject(value.profile)) {
+    throw new Error("対応していないバックアップ形式です（データバージョン2または3が必要です）。");
   }
   const item = value.profile;
   if (typeof item.id !== "string" || typeof item.name !== "string" || !isObject(item.records)) {
     throw new Error("端末データが壊れています。");
+  }
+  if (value.version === 2) {
+    const migrated = structuredClone(value) as Record<string, unknown>;
+    migrated.version = 3;
+    const migratedProfile = migrated.profile as Record<string, unknown>;
+    const records = migratedProfile.records as Record<string, Record<string, unknown>>;
+    for (const record of Object.values(records)) {
+      // v2では所持切替だけでも初期値が「手入力」として保存された。編集日時がない初期値だけを除き、v3の取込値を表示できるようにする。
+      if (record.manualUpdatedAt) continue;
+      if (JSON.stringify(record.skills) === "[1,1,1]") delete record.skills;
+      if (JSON.stringify(record.cube) === JSON.stringify({ name: "なし", level: 0 })) delete record.cube;
+      if (JSON.stringify(record.collection) === JSON.stringify({ rarity: "なし", level: 0, treasure: false })) delete record.collection;
+      if (record.gear && JSON.stringify(record.gear) === JSON.stringify(defaultGear())) delete record.gear;
+    }
+    return migrated as unknown as AppData;
   }
   return value as unknown as AppData;
 }

@@ -1,18 +1,23 @@
 import { useRef, useState } from "react";
-import type { AppData, CharacterSummary } from "../types";
-import { importBlablaRoster, mergeImportedRecord } from "../api/nikkeApi";
+import type { AppData, BlablaConnection, CharacterSummary } from "../types";
 import { createDefaultData, validateImport } from "../storage";
 import { sources } from "../data/sources";
+import { maskedOpenid } from "../blablaConnection";
 
 interface Props {
   data: AppData;
   catalog: CharacterSummary[];
   catalogStatus: string;
+  connection: BlablaConnection | null;
+  syncState: string;
+  onConnect: (link: string) => Promise<void>;
+  onSync: () => void;
+  onConnectionChange: (value: BlablaConnection | null) => void;
   onDataChange: (data: AppData) => void;
   onRefresh: () => void;
 }
 
-export function SettingsPage({ data, catalog, catalogStatus, onDataChange, onRefresh }: Props) {
+export function SettingsPage({ data, catalog, catalogStatus, connection, syncState, onConnect, onSync, onConnectionChange, onDataChange, onRefresh }: Props) {
   const [link, setLink] = useState("");
   const [importState, setImportState] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -35,35 +40,32 @@ export function SettingsPage({ data, catalog, catalogStatus, onDataChange, onRef
     } catch (error) { setImportState(error instanceof Error ? error.message : "読み込めませんでした。"); }
     if (fileRef.current) fileRef.current.value = "";
   };
-  const importRoster = async () => {
-    setImportState("共有プロフィールを取得中…");
-    try {
-      const rows = await importBlablaRoster(link);
-      const records = { ...data.profile.records };
-      let matched = 0;
-      for (const row of rows) {
-        // ユーザーAPIの内部IDは図鑑IDと異なる場合があるため、日本語名とresourceIdも照合する。
-        const character = catalog.find((item) => item.id === row.id || item.resourceId === row.resourceId || (row.name && item.name === row.name));
-        if (!character) continue;
-        records[character.id] = { ...mergeImportedRecord(records[character.id], row.snapshot), displayName: character.name };
-        matched += 1;
-      }
-      onDataChange({ ...data, profile: { ...data.profile, records } });
-      setLink("");
-      setImportState(`${matched}体を取り込みました${matched !== rows.length ? `（${rows.length - matched}体は図鑑IDと照合できず除外）` : ""}。手入力値は変更していません。共有リンクは保存していません。`);
-    } catch (error) { setImportState(error instanceof Error ? error.message : "取り込みに失敗しました。"); }
+  const connect = async () => {
+    setImportState("");
+    try { await onConnect(link); setLink(""); }
+    catch (error) { setImportState(error instanceof Error ? error.message : "共有URLを確認してください。"); }
   };
   const clear = () => {
     if (!window.confirm("この端末の所持・育成・保存編成をすべて削除します。JSONバックアップは作成しましたか？")) return;
     if (!window.confirm("元に戻せません。本当に全データを削除しますか？")) return;
     onDataChange(createDefaultData());
+    onConnectionChange(null);
   };
 
   return <section className="page">
     <div className="page-title"><p className="eyebrow">CONTROL</p><h1>設定</h1><p>更新・取り込み・バックアップ・出典</p></div>
     <article className="panel"><div className="panel-head"><div><h2>マスターデータ</h2><p>{catalogStatus}</p></div><button className="secondary" onClick={onRefresh}>手動更新</button></div><div className="status-row"><span>現在 {catalog.length}体</span><span>取得元 {data.catalogMeta?.source ?? "内蔵最小データ"}</span><span>取得日時 {data.catalogMeta ? new Date(data.catalogMeta.fetchedAt).toLocaleString("ja-JP") : "未取得"}</span></div></article>
 
-    <article className="panel"><h2>BlablaLinkから所持を取り込む</h2><p>公式BlablaLinkで自分のプロフィールを共有公開し、その共有URLを貼り付けます。パスワード・Cookie・認証トークンは入力しないでください。</p><div className="action-row"><input type="url" placeholder="https://www.blablalink.com/user?openid=…" value={link} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={importRoster} disabled={!link.trim()}>取り込む</button></div><p className="muted">リンク自体は保存しません。取得値は別スナップショットとして保存し、既存の手入力を上書きしません。非公開プロフィールは取得できません。</p>{importState && <p className="notice" role="status">{importState}</p>}</article>
+    <article className="panel"><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。手入力、育成目標、メモ、保存編成は上書きしません。</p>
+      {connection ? <>
+        <div className="status-row"><span>接続ID {maskedOpenid(connection.openid)}</span><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
+        <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回成功から3日経過していれば自動確認する</label>
+        <div className="button-row"><button className="primary" onClick={onSync}>今すぐ取り込む</button><button className="secondary" onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続IDを削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
+        {connection.lastError && <p className="error-text">前回エラー: {connection.lastError}</p>}
+      </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="https://www.blablalink.com/user?openid=…" value={link} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim()}>接続して取り込む</button></div>}
+      <details className="share-guide"><summary>公開BlablaLink共有URLの取得方法</summary><ol><li>NIKKE公式BlablaLinkへログインし、自分のプロフィールを開きます。</li><li>プロフィールの共有設定を公開にして「共有」からURLをコピーします。</li><li><code>https://www.blablalink.com/user?openid=…</code> の形のURLを上へ貼り付けます。</li></ol><p>ゲームのパスワード、Cookie、認証トークンは入力しないでください。</p></details>
+      <p className="muted">接続中は公開URL内のopenidと選択サーバーだけをこの端末へ別保存します。JSONバックアップには含めません。バックグラウンド常駐や定期ポーリングは行いません。</p>{(syncState || importState) && <p className="notice" role="status">{importState || syncState}</p>}
+    </article>
 
     <article className="panel"><h2>バックアップ</h2><p>Safariのサイトデータ削除や別端末への移行に備えて、定期的にJSONを書き出してください。画像・API詳細キャッシュは含みません。</p><div className="button-row"><button className="primary" onClick={exportData}>JSONを書き出す</button><button className="secondary" onClick={() => fileRef.current?.click()}>JSONから復元</button><input ref={fileRef} className="visually-hidden" type="file" accept="application/json,.json" onChange={(e) => importFile(e.target.files?.[0])} /></div><p className="muted">夫婦それぞれの端末で独立保存されます。自動同期・アカウント機能はありません。</p></article>
 

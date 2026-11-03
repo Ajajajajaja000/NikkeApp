@@ -18,6 +18,12 @@ export const sources = [
     note: "認証不要の静的JSON。CORS許可を実測。英語中心で、評価や推奨ビルドは含まれないため本アプリの通常取得には未使用。",
   },
   {
+    title: "Nikkers — キャラ別ビルド",
+    url: "https://nikkers.cc/api",
+    checked: "2026-11-03",
+    note: "確認できたキャラのオバロ効果・キューブ候補だけを構造化して表示。実行時APIとしては使わず、未確認キャラへ推測で流用しない。サイト側の更新後は再確認が必要。",
+  },
+  {
     title: "Prydwen — Anomaly Interception",
     url: "https://www.prydwen.gg/nikke/guides/game-modes-anomaly-interception",
     checked: "2026-11-03",
