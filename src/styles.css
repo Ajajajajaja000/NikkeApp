@@ -103,7 +103,7 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .filters { display: flex; gap: 8px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
 .filters select { flex: 0 0 auto; width: auto; min-width: 130px; min-height: 38px; padding: 6px 28px 6px 9px; font-size: .8rem; }
-.roster-list { display: grid; gap: 8px; }
+.roster-list { display: grid; gap: 8px; overflow-anchor: none; }
 .nikke-card { border: 1px solid #222c3b; border-radius: 15px; background: #0e141e; overflow: hidden; }
 .nikke-card.owned { border-color: #31584f; background: linear-gradient(90deg, rgba(94,234,212,.035), transparent 38%), #0f161f; }
 .nikke-summary { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 82px; padding: 11px; cursor: pointer; }
