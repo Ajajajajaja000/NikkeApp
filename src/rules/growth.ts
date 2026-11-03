@@ -1,27 +1,27 @@
 import type { CollectionRecord, CoreDustState, CubeRecord, GearRecord, GearSlot, NikkeRecord } from "../types";
 
 export function effectiveLevel(record: NikkeRecord | undefined): number {
-  return record?.level ?? record?.imported?.level ?? 1;
+  return record?.imported?.level ?? record?.level ?? 1;
 }
 
 export function effectiveLimitBreak(record: NikkeRecord | undefined): number {
-  return record?.limitBreak ?? record?.imported?.limitBreak ?? 0;
+  return record?.imported?.limitBreak ?? record?.limitBreak ?? 0;
 }
 
 export function effectiveSkills(record: NikkeRecord | undefined): [number, number, number] {
-  return record?.skills ?? record?.imported?.skills ?? [1, 1, 1];
+  return record?.imported?.skills ?? record?.skills ?? [1, 1, 1];
 }
 
 export function effectiveGear(record: NikkeRecord | undefined, slot: GearSlot): GearRecord {
-  return record?.gear?.[slot] ?? record?.imported?.gear?.[slot] ?? { tier: "未設定", level: 0, overload: false };
+  return record?.imported?.gear?.[slot] ?? record?.gear?.[slot] ?? { tier: "未設定", level: 0, overload: false };
 }
 
 export function effectiveCube(record: NikkeRecord | undefined): CubeRecord {
-  return record?.cube ?? record?.imported?.cube ?? { name: "なし", level: 0 };
+  return record?.imported?.cube ?? record?.cube ?? { name: "なし", level: 0 };
 }
 
 export function effectiveCollection(record: NikkeRecord | undefined): CollectionRecord {
-  return record?.collection ?? record?.imported?.collection ?? { rarity: "なし", level: 0, treasure: false };
+  return record?.imported?.collection ?? record?.collection ?? { rarity: "なし", level: 0, treasure: false };
 }
 
 export function coreDustForLevel(targetLevel: number): number {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { blablaErrorMessage, extractBlablaId, mergeImportedRecord, normalizeCharacter } from "../src/api/nikkeApi";
+import { effectiveLevel, effectiveSkills } from "../src/rules/growth";
+import { overloadRecommendation, overloadRecommendationCount } from "../src/data/overloadRecommendations";
 
 describe("character identity and import", () => {
   it("レッドフードとラピ：レッドフードを別IDで保持する", () => {
@@ -36,5 +38,17 @@ describe("character identity and import", () => {
     expect(merged.cube?.name).toBe("手入力キューブ");
     expect(merged.imported?.cube?.name).toBe("APIキューブ");
     expect(merged.imported?.level).toBe(300);
+  });
+
+  it("表示上はBlablaLink取込値を旧手入力値より優先する", () => {
+    const record = mergeImportedRecord({ owned: true, favorite: false, level: 320, skills: [10, 9, 10] }, { level: 300, skills: [7, 8, 9], fetchedAt: "2026-11-03T00:00:00Z", source: "test" });
+    expect(effectiveLevel(record)).toBe(300);
+    expect(effectiveSkills(record)).toEqual([7, 8, 9]);
+  });
+
+  it("オバロ推奨を多数収録し、同名をresourceIdで区別する", () => {
+    expect(overloadRecommendationCount).toBeGreaterThanOrEqual(50);
+    expect(overloadRecommendation(470, "レッドフード")?.resourceId).toBe(470);
+    expect(overloadRecommendation(16, "ラピ：レッドフード")?.resourceId).toBe(16);
   });
 });

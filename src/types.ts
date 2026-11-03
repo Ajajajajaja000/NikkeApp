@@ -134,8 +134,8 @@ export interface BlablaConnection {
 export interface TeamSuggestion {
   title: string;
   characterIds: string[];
+  referenceCharacterIds: string[];
   mode: "フルオート向け" | "手動推奨" | "編成不足";
-  score: number;
   reasons: string[];
   cautions: string[];
   alternatives: string[];

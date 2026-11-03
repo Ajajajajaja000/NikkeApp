@@ -66,7 +66,7 @@ export function NikkePage({ catalog, records, onRecordChange }: Props) {
           <div className="avatar">{character.icon ? <img src={character.icon} alt="" loading="lazy" /> : <span>{character.name.slice(0, 1)}</span>}</div>
           <div className="nikke-main"><h3>{character.name}</h3><p>{character.element || "属性不明"} · {character.corporation || "企業不明"} · {character.weapon || "武器不明"}</p><div className="chips"><span>B{character.bursts.join("/") || "?"}</span><span>{character.class}</span><span>ID {character.id}</span></div></div>
           <div className="card-actions">
-            <button className={`icon-button ${record.favorite ? "selected" : ""}`} aria-label="育成対象" title="育成対象" onClick={(e) => { e.stopPropagation(); update(character, { favorite: !record.favorite }); }}>☆</button>
+            <button className={`growth-toggle ${record.favorite ? "selected" : ""}`} aria-label={`${character.name}をホームの育成対象に${record.favorite ? "表示中" : "追加"}`} title="ホームの育成対象に表示" onClick={(e) => { e.stopPropagation(); update(character, { favorite: !record.favorite }); }}>{record.favorite ? "育成対象中" : "育成対象にする"}</button>
             <button className={`owned-button ${record.owned ? "selected" : ""}`} onClick={(e) => { e.stopPropagation(); update(character, { owned: !record.owned }); }}>{record.owned ? "所持" : "未所持"}</button>
           </div>
         </div>
