@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeImportedRecord, normalizeCharacter } from "../src/api/nikkeApi";
+import { blablaErrorMessage, extractBlablaId, mergeImportedRecord, normalizeCharacter } from "../src/api/nikkeApi";
 
 describe("character identity and import", () => {
   it("レッドフードとラピ：レッドフードを別IDで保持する", () => {
@@ -12,6 +12,20 @@ describe("character identity and import", () => {
   it("APIのAllバーストをI・II・IIIとして扱う", () => {
     const redHood = normalizeCharacter({ id: 447001, name: "レッドフード", burst: "All", weapon: { type: "SR" } });
     expect(redHood.bursts).toEqual(["I", "II", "III"]);
+  });
+
+  it("Base64パディング付きBlablaLink URLと保存済みopenidを解析する", () => {
+    const id = "sampleOpenid123==";
+    expect(extractBlablaId(`https://www.blablalink.com/user?openid=${id}`)).toBe(id);
+    expect(extractBlablaId(id)).toBe(id);
+    expect(extractBlablaId(`[共有URL](https://www.blablalink.com/user?openid=${id})`)).toBe(id);
+    expect(extractBlablaId(`\u200Bhttps://www.blablalink.com/user?openid=${id}。`)).toBe(id);
+  });
+
+  it("不正な文字列ではブラウザー固有エラーをそのまま表示しない", () => {
+    expect(() => extractBlablaId("openidのうしろ")).toThrow("BlablaLink共有URLを確認してください");
+    expect(blablaErrorMessage(new TypeError("Failed to construct 'URL': Invalid URL"))).toMatch(/共有URLを読み取れません/);
+    expect(blablaErrorMessage(new TypeError("Load failed"))).toMatch(/通信できません/);
   });
 
   it("取り込み時に手入力を上書きしない", () => {

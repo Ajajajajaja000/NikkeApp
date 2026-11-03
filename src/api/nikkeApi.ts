@@ -46,12 +46,28 @@ export function normalizeCharacter(raw: unknown): CharacterSummary {
 }
 
 async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
-  const response = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  let response: Response;
+  try {
+    response = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    throw new Error("通信できませんでした。インターネット接続を確認して、もう一度お試しください。");
+  }
   if (!response.ok) {
-    const reason = response.status === 404 ? "共有プロフィールが非公開、または見つかりません。" : response.status === 502 ? "BlablaLink側との接続に失敗しました（HTTP 502）。保存済みデータは変更していません。時間を置いて再試行してください。" : response.status === 503 ? "BlablaLink取込APIは現在利用できません（HTTP 503）。" : `HTTP ${response.status}`;
+    const reason = response.status === 400 ? "共有URLの形式またはサーバー情報が正しくありません。共有URL全体をコピーし直してください。" : response.status === 404 ? "共有プロフィールが非公開、または見つかりません。BlablaLinkの公開設定を確認してください。" : response.status === 429 ? "短時間に更新が集中しています。しばらく待ってから再試行してください。" : response.status === 502 ? "BlablaLink側との接続に失敗しました（HTTP 502）。保存済みデータは変更していません。時間を置いて再試行してください。" : response.status === 503 ? "BlablaLink取込APIは現在利用できません（HTTP 503）。時間を置いて再試行してください。" : `APIでエラーが発生しました（HTTP ${response.status}）。保存済みデータは変更していません。`;
     throw new Error(reason);
   }
-  return response.json();
+  try { return await response.json(); }
+  catch { throw new Error("APIの応答を読み取れませんでした。時間を置いて再試行してください。"); }
+}
+
+export function blablaErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (/[ぁ-んァ-ヶ一-龠]/.test(message)) return message;
+  if (/invalid url|construct.*url|parsed as a url/i.test(message)) return "BlablaLink共有URLを読み取れませんでした。共有URL全体をコピーし直してください。";
+  if (/failed to fetch|network|load failed|internet/i.test(message)) return "通信できませんでした。インターネット接続を確認して、もう一度お試しください。";
+  if (/json|unexpected token/i.test(message)) return "APIの応答を読み取れませんでした。時間を置いて再試行してください。";
+  return "BlablaLinkからの取り込みに失敗しました。保存済みデータは変更していません。時間を置いて再試行してください。";
 }
 
 export async function fetchCatalog(signal?: AbortSignal): Promise<CharacterSummary[]> {
@@ -75,16 +91,29 @@ export async function fetchCharacterDetail(id: string, signal?: AbortSignal): Pr
 }
 
 export function extractBlablaId(input: string): string {
-  const trimmed = input.trim();
-  if (!trimmed) throw new Error("共有リンクを入力してください。");
+  const cleaned = input.trim().replace(/[\u200B-\u200D\uFEFF]/g, "");
+  if (!cleaned) throw new Error("共有リンクを入力してください。");
+  // BlablaLinkのopenidは標準Base64なので、末尾の = と + / も有効文字として扱う。
+  const isOpenid = (value: string) => /^[A-Za-z0-9+/_-]{6,}={0,2}$/.test(value);
+  if (isOpenid(cleaned)) return cleaned;
+
+  const pastedUrl = cleaned.match(/https?:\/\/[^\s<>"']+/i)?.[0]?.replace(/[\])}>、。]+$/g, "") ?? cleaned;
   try {
-    const url = new URL(trimmed);
+    const url = new URL(pastedUrl);
     const id = url.searchParams.get("openid") ?? url.searchParams.get("blablaid");
     if (!id) throw new Error("リンクにopenidがありません。");
+    if (!isOpenid(id)) throw new Error("openidの形式を確認してください。");
     return id;
   } catch (error) {
-    if (/^[A-Za-z0-9_-]{6,}$/.test(trimmed)) return trimmed;
-    throw error instanceof Error ? error : new Error("共有リンクを確認してください。");
+    if (error instanceof Error && /openid/.test(error.message)) throw error;
+    const queryId = cleaned.match(/(?:openid|blablaid)=([^&#\s)\]]+)/i)?.[1];
+    if (queryId) {
+      try {
+        const decoded = decodeURIComponent(queryId);
+        if (isOpenid(decoded)) return decoded;
+      } catch { /* 下の共通メッセージを表示する */ }
+    }
+    throw new Error("BlablaLink共有URLを確認してください。URL全体をコピーして貼り付けてください。");
   }
 }
 
