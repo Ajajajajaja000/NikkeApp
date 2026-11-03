@@ -1,4 +1,4 @@
-import type { BurstStage, CharacterDetail, CharacterSummary, ImportedSnapshot, NikkeRecord } from "../types";
+import type { BurstStage, CharacterDetail, CharacterSummary, CollectionRecord, GearRecord, GearSlot, ImportedSnapshot, NikkeRecord, OverloadOption } from "../types";
 
 const API_BASE = "https://nikke-api.pages.dev";
 
@@ -48,7 +48,7 @@ export function normalizeCharacter(raw: unknown): CharacterSummary {
 async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
   const response = await fetch(url, { signal, headers: { Accept: "application/json" } });
   if (!response.ok) {
-    const reason = response.status === 404 ? "見つからないか、共有設定が非公開です。" : `HTTP ${response.status}`;
+    const reason = response.status === 404 ? "共有プロフィールが非公開、または見つかりません。" : response.status === 502 ? "BlablaLink側との接続に失敗しました（HTTP 502）。保存済みデータは変更していません。時間を置いて再試行してください。" : response.status === 503 ? "BlablaLink取込APIは現在利用できません（HTTP 503）。" : `HTTP ${response.status}`;
     throw new Error(reason);
   }
   return response.json();
@@ -96,35 +96,103 @@ function firstNumber(...values: unknown[]): number | undefined {
   return undefined;
 }
 
-export async function importBlablaRoster(link: string): Promise<Array<{ id: string; name: string; resourceId?: number; snapshot: ImportedSnapshot }>> {
-  const blablaId = extractBlablaId(link);
-  // 共有URLやopenidは保存しない。APIへ一度送信し、結果だけを個人データへマージする。
-  const rawJson = await getJson(`${API_BASE}/api/user/${encodeURIComponent(blablaId)}/nikke?lang=ja`);
-  const json = obj(rawJson);
-  const candidates = (Array.isArray(rawJson) ? rawJson : [json.nikkes, json.characters, json.data, json.items].find(Array.isArray)) as unknown[] | undefined;
-  if (!candidates?.length) throw new Error("公開された所持ニケを取得できませんでした。共有設定を確認してください。");
-  const fetchedAt = new Date().toISOString();
-  return candidates.map((raw) => {
+type MasterItem = { id: number; name: string; rare?: string; slot?: string; corporation?: string; rank?: number };
+export interface ImportedRosterRow { nameCode: number; resourceId?: number; snapshot: ImportedSnapshot }
+export interface ImportedRoster { rows: ImportedRosterRow[]; area?: number; fetchedAt: string }
+
+function numericEntries(source: JsonObject, pattern: RegExp): number[] {
+  return Object.entries(source).filter(([key]) => pattern.test(key)).map(([, value]) => firstNumber(value)).filter((value): value is number => value !== undefined && value > 0);
+}
+
+function normalizeSlot(slot: string): GearSlot { return ({ body: "chest", torso: "chest", arm: "arms", leg: "legs" } as Record<string, GearSlot>)[slot] ?? "head"; }
+
+function parseGear(detail: JsonObject, equips: Map<number, MasterItem>, options: Map<number, MasterItem>, effects: Map<number, JsonObject>): Partial<Record<GearSlot, GearRecord>> {
+  const result: Partial<Record<GearSlot, GearRecord>> = {};
+  for (const rawSlot of ["head", "torso", "arm", "leg"]) {
+    const tid = firstNumber(detail[`${rawSlot}_equip_tid`]);
+    if (!tid) continue;
+    const master = equips.get(tid);
+    const optionIds = numericEntries(detail, new RegExp(`^${rawSlot}_equip_.*(option|effect).*`, "i"));
+    const parsedOptions: OverloadOption[] = [...new Set(optionIds)].map((id) => {
+      const option = options.get(id);
+      const state = effects.get(id);
+      const functions = Array.isArray(state?.function_details) ? state.function_details.map(obj) : [];
+      const value = firstNumber(functions[0]?.function_value);
+      return { id, name: option?.name ?? `効果ID ${id}`, rank: option?.rank, value: value === undefined ? undefined : value / 100, unit: value === undefined ? undefined : "%" };
+    });
+    result[normalizeSlot(rawSlot)] = {
+      id: tid,
+      name: master?.name ?? `装備ID ${tid}`,
+      corporation: master?.corporation,
+      tier: parsedOptions.length ? "OL" : (master?.rare ?? "未設定"),
+      level: firstNumber(detail[`${rawSlot}_equip_lv`], detail[`${rawSlot}_equip_level`]) ?? 0,
+      overload: parsedOptions.length > 0 || master?.rare === "T10",
+      options: parsedOptions,
+    };
+  }
+  return result;
+}
+
+function parseCollection(detail: JsonObject, favorites: Map<number, MasterItem>): CollectionRecord | undefined {
+  const id = firstNumber(detail.favorite_item_tid, detail.favorite_tid, detail.collection_item_tid, detail.collection_tid);
+  if (!id) return undefined;
+  const master = favorites.get(id);
+  const rawRare = master?.rare;
+  const rarity = rawRare === "R" || rawRare === "SR" || rawRare === "SSR" ? rawRare : "なし";
+  return { id, name: master?.name ?? `コレクションID ${id}`, rarity, level: firstNumber(detail.favorite_item_lv, detail.favorite_lv, detail.collection_item_lv, detail.collection_lv) ?? 0, treasure: rarity === "SSR" || Boolean(detail.favorite_item_is_treasure ?? detail.is_favorite_item) };
+}
+
+function listMap(json: unknown, key: string): Map<number, MasterItem> {
+  const rows = obj(json)[key];
+  return new Map((Array.isArray(rows) ? rows : []).map((raw) => {
     const item = obj(raw);
-    const character = obj(item.character);
-    const combat = obj(item.combat);
-    const id = String(character.id ?? item.characterId ?? item.id ?? character.resourceId ?? character.nameCode ?? "");
-    const grade = firstNumber(item.grade, combat.grade);
-    const core = firstNumber(item.core, combat.core);
-    const snapshot: ImportedSnapshot = {
-      level: firstNumber(combat.level, item.level, item.lv),
-      limitBreak: grade !== undefined || core !== undefined ? Math.min(3, grade ?? 0) + Math.max(0, core ?? 0) : firstNumber(combat.limitBreak, item.limitBreak, item.coreBreak),
-      combatPower: firstNumber(typeof item.combat === "number" ? item.combat : undefined, combat.power, item.combatPower, item.power),
-      fetchedAt,
-      source: "BlablaLink共有プロフィール / 非公式NIKKE API",
-    };
-    return {
-      id,
-      name: text(character.name ?? item.name),
-      resourceId: firstNumber(character.resourceId),
-      snapshot,
-    };
-  }).filter((entry) => entry.id);
+    return [Number(item.id), { id: Number(item.id), name: text(item.name) || `${item.id}`, rare: text(item.rare), slot: text(item.slot), corporation: text(item.corporation), rank: firstNumber(item.rank) }];
+  }));
+}
+
+export async function importBlablaRoster(input: string, area?: number): Promise<ImportedRoster> {
+  const blablaId = extractBlablaId(input);
+  const areaQuery = area ? `?area=${area}` : "";
+  const [rosterRaw, equipsRaw, optionsRaw, cubesRaw, favoritesRaw, idMapRaw] = await Promise.all([
+    getJson(`${API_BASE}/api/user/${encodeURIComponent(blablaId)}/roster${areaQuery}`),
+    getJson(`${API_BASE}/api/equips?lang=ja&limit=500`), getJson(`${API_BASE}/api/equips/options?lang=ja&limit=500`),
+    getJson(`${API_BASE}/api/cubes?lang=ja&limit=500`), getJson(`${API_BASE}/api/favorites?lang=ja&limit=500`),
+    getJson(`${API_BASE}/api/tables/character_id_map.json`),
+  ]);
+  return parseRosterPayload(rosterRaw, equipsRaw, optionsRaw, cubesRaw, favoritesRaw, idMapRaw);
+}
+
+export function parseRosterPayload(rosterRaw: unknown, equipsRaw: unknown, optionsRaw: unknown, cubesRaw: unknown, favoritesRaw: unknown, idMapRaw: unknown, now = new Date()): ImportedRoster {
+  const areas = Array.isArray(obj(rosterRaw).areas) ? obj(rosterRaw).areas as unknown[] : [];
+  const selected = areas.map(obj).find((item) => Array.isArray(item.characters) && item.characters.length > 0);
+  if (!selected) throw new Error("公開された所持ニケを取得できませんでした。共有設定を確認してください。");
+  const characters = (selected.characters as unknown[]).map(obj);
+  const details = (Array.isArray(selected.details) ? selected.details : []).map(obj);
+  if (details.length < characters.length * 0.8) throw new Error("詳細データが不足していたため取り込みませんでした。保存済みデータは変更していません。");
+  const detailByCode = new Map(details.map((item) => [firstNumber(item.name_code), item]));
+  const effects = new Map((Array.isArray(selected.stateEffects) ? selected.stateEffects : []).map((raw) => { const item = obj(raw); return [Number(item.id), item]; }));
+  const equips = listMap(equipsRaw, "equips"), options = listMap(optionsRaw, "options"), cubes = listMap(cubesRaw, "cubes"), favorites = listMap(favoritesRaw, "favorites");
+  const idRows = Array.isArray(idMapRaw) ? idMapRaw.map(obj) : [];
+  const resourceByCode = new Map<number, number>();
+  for (const row of idRows) { const code = firstNumber(row.name_code), resource = firstNumber(row.resource_id); if (code && resource && !resourceByCode.has(code)) resourceByCode.set(code, resource); }
+  const fetchedAt = now.toISOString();
+  const rows = characters.map((item): ImportedRosterRow | null => {
+    const nameCode = firstNumber(item.name_code); if (!nameCode) return null;
+    const detail = detailByCode.get(nameCode) ?? {};
+    const cubeId = firstNumber(detail.cube_tid, detail.cube_id, detail.harmony_cube_tid);
+    const cubeMaster = cubeId ? cubes.get(cubeId) : undefined;
+    const grade = firstNumber(item.grade), core = firstNumber(item.core);
+    return { nameCode, resourceId: resourceByCode.get(nameCode), snapshot: {
+      level: firstNumber(item.lv, item.level), limitBreak: grade !== undefined || core !== undefined ? Math.min(3, grade ?? 0) + Math.max(0, core ?? 0) : undefined,
+      combatPower: firstNumber(item.combat, item.combat_power),
+      skills: [firstNumber(detail.skill1_lv) ?? 1, firstNumber(detail.skill2_lv) ?? 1, firstNumber(detail.ulti_skill_lv, detail.burst_lv) ?? 1],
+      gear: parseGear(detail, equips, options, effects),
+      cube: cubeId ? { id: cubeId, name: cubeMaster?.name ?? `キューブID ${cubeId}`, level: firstNumber(detail.cube_lv, detail.cube_level, detail.harmony_cube_lv) ?? 0 } : undefined,
+      collection: parseCollection(detail, favorites), fetchedAt, source: "BlablaLink公開プロフィール / 非公式NIKKE API roster",
+    } };
+  }).filter((row): row is ImportedRosterRow => row !== null);
+  if (!rows.length) throw new Error("所持ニケが0件だったため取り込みませんでした。");
+  return { rows, area: firstNumber(selected.area), fetchedAt };
 }
 
 export function mergeImportedRecord(current: NikkeRecord | undefined, snapshot: ImportedSnapshot): NikkeRecord {

@@ -22,7 +22,16 @@ describe("backup schema", () => {
   });
 
   it("不正なバージョンを拒否する", () => {
-    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2/);
+    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2または3/);
+  });
+
+  it("バージョン2を3へ移行する", () => {
+    const old = { ...createDefaultData(), version: 2 };
+    old.profile.records.x = { owned: true, favorite: false, skills: [1, 1, 1], cube: { name: "なし", level: 0 } };
+    const migrated = validateImport(JSON.parse(JSON.stringify(old)));
+    expect(migrated.version).toBe(3);
+    expect(migrated.profile.records.x.skills).toBeUndefined();
+    expect(migrated.profile.records.x.cube).toBeUndefined();
   });
 
   it("再読み込み相当でも所持・手入力記録を復元する", () => {

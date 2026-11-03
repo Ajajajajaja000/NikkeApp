@@ -15,6 +15,14 @@ export interface CharacterSummary {
   source: "nikke-api" | "fallback";
 }
 
+export interface OverloadOption {
+  id?: number;
+  name: string;
+  rank?: number;
+  value?: number;
+  unit?: string;
+}
+
 export interface CharacterSkill {
   slot: string;
   name: string;
@@ -28,9 +36,22 @@ export interface CharacterDetail extends CharacterSummary {
 }
 
 export interface GearRecord {
+  id?: number;
+  name?: string;
+  corporation?: string;
   tier: string;
   level: number;
   overload: boolean;
+  options?: OverloadOption[];
+}
+
+export interface CubeRecord { id?: number; name: string; level: number }
+export interface CollectionRecord {
+  id?: number;
+  name?: string;
+  rarity: "なし" | "R" | "SR" | "SSR";
+  level: number;
+  treasure: boolean;
 }
 
 export interface ImportedSnapshot {
@@ -38,6 +59,9 @@ export interface ImportedSnapshot {
   limitBreak?: number;
   combatPower?: number;
   skills?: [number, number, number];
+  gear?: Partial<Record<GearSlot, GearRecord>>;
+  cube?: CubeRecord;
+  collection?: CollectionRecord;
   fetchedAt: string;
   source: string;
 }
@@ -50,9 +74,9 @@ export interface NikkeRecord {
   limitBreak?: number;
   combatPower?: number;
   skills?: [number, number, number];
-  gear?: Record<GearSlot, GearRecord>;
-  cube?: { name: string; level: number };
-  collection?: { rarity: "なし" | "R" | "SR" | "SSR"; level: number; treasure: boolean };
+  gear?: Partial<Record<GearSlot, GearRecord>>;
+  cube?: CubeRecord;
+  collection?: CollectionRecord;
   target?: {
     skills: [number, number, number];
     gearTier: string;
@@ -89,9 +113,22 @@ export interface LocalProfile {
 }
 
 export interface AppData {
-  version: 2;
+  version: 3;
   profile: LocalProfile;
   catalogMeta?: { fetchedAt: string; source: string; count: number };
+  blablaMeta?: { fetchedAt: string; source: string; count: number };
+}
+
+export interface BlablaConnection {
+  version: 1;
+  openid: string;
+  area?: number;
+  autoSync: boolean;
+  intervalHours: 72;
+  lastAttemptAt?: string;
+  lastSuccessAt?: string;
+  lastCount?: number;
+  lastError?: string;
 }
 
 export interface TeamSuggestion {

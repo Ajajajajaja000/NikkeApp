@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CharacterSummary, NikkeRecord } from "./types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { BlablaConnection, CharacterSummary, NikkeRecord } from "./types";
 import { BottomNav, type PageId } from "./components/BottomNav";
 import { HomePage } from "./pages/HomePage";
 import { NikkePage } from "./pages/NikkePage";
 import { TeamsPage } from "./pages/TeamsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { fallbackCharacters } from "./data/fallback";
-import { fetchCatalog } from "./api/nikkeApi";
+import { extractBlablaId, fetchCatalog, importBlablaRoster, mergeImportedRecord } from "./api/nikkeApi";
 import { useAppData } from "./hooks/useAppData";
+import { clearConnection, createConnection, loadConnection, saveConnection, shouldAutoSync } from "./blablaConnection";
 
 export default function App() {
   const [page, setPage] = useState<PageId>("home");
@@ -15,6 +16,14 @@ export default function App() {
   const [remoteCatalog, setRemoteCatalog] = useState<CharacterSummary[]>([]);
   const [catalogStatus, setCatalogStatus] = useState("APIへ接続しています…");
   const [refreshTick, setRefreshTick] = useState(0);
+  const [connection, setConnectionState] = useState<BlablaConnection | null>(() => loadConnection());
+  const [syncState, setSyncState] = useState("");
+  const syncing = useRef(false);
+
+  const setConnection = useCallback((next: BlablaConnection | null) => {
+    setConnectionState(next);
+    if (next) saveConnection(next); else clearConnection();
+  }, []);
 
   const refresh = useCallback(() => setRefreshTick((value) => value + 1), []);
   useEffect(() => {
@@ -39,11 +48,52 @@ export default function App() {
     return [...base, ...orphans];
   }, [remoteCatalog, data.profile.records]);
 
+  const syncBlabla = useCallback(async (openid = connection?.openid, baseConnection = connection) => {
+    if (!openid || syncing.current || remoteCatalog.length === 0) return;
+    syncing.current = true;
+    const attemptedAt = new Date().toISOString();
+    const active = baseConnection ?? createConnection(openid);
+    setConnection({ ...active, openid, lastAttemptAt: attemptedAt });
+    setSyncState("BlablaLinkから詳細データを取得中…");
+    try {
+      const imported = await importBlablaRoster(openid, active.area);
+      if (active.lastCount && imported.rows.length < active.lastCount * 0.6) throw new Error("前回より取得件数が大幅に少ないため、データを更新しませんでした。");
+      const matches = imported.rows.map((row) => ({ row, character: remoteCatalog.find((item) => item.resourceId === row.resourceId) })).filter((item) => item.character);
+      if (matches.length < imported.rows.length * 0.8) throw new Error(`図鑑IDとの照合が不足しています（${matches.length}/${imported.rows.length}体）。保存済みデータは変更していません。`);
+      setData((current) => {
+        const records = { ...current.profile.records };
+        for (const { row, character } of matches) if (character) records[character.id] = { ...mergeImportedRecord(records[character.id], row.snapshot), displayName: character.name };
+        return { ...current, blablaMeta: { fetchedAt: imported.fetchedAt, source: "BlablaLink公開プロフィール / 非公式NIKKE API", count: matches.length }, profile: { ...current.profile, records } };
+      });
+      const next = { ...active, openid, area: imported.area, lastAttemptAt: attemptedAt, lastSuccessAt: imported.fetchedAt, lastCount: matches.length, lastError: undefined };
+      setConnection(next);
+      setSyncState(`${matches.length}体を取り込みました。手入力値は変更していません。`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "取り込みに失敗しました。";
+      setConnection({ ...active, openid, lastAttemptAt: attemptedAt, lastError: message });
+      setSyncState(message);
+    } finally { syncing.current = false; }
+  }, [connection, remoteCatalog, setConnection, setData]);
+
+  const connectBlabla = useCallback(async (link: string) => {
+    const openid = extractBlablaId(link);
+    const next = createConnection(openid);
+    setConnection(next);
+    await syncBlabla(openid, next);
+  }, [setConnection, syncBlabla]);
+
+  useEffect(() => {
+    const check = () => { if (document.visibilityState === "visible" && shouldAutoSync(connection)) void syncBlabla(); };
+    check();
+    document.addEventListener("visibilitychange", check);
+    return () => document.removeEventListener("visibilitychange", check);
+  }, [connection, syncBlabla]);
+
   const updateRecord = (id: string, record: NikkeRecord) => setData((current) => ({ ...current, profile: { ...current.profile, records: { ...current.profile.records, [id]: record } } }));
-  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} coreDust={data.profile.coreDust} onCoreDustChange={(coreDust) => setData((current) => ({ ...current, profile: { ...current.profile, coreDust } }))} goNikkes={() => setPage("nikkes")} />
+  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} coreDust={data.profile.coreDust} lastBlablaImport={data.blablaMeta?.fetchedAt} onCoreDustChange={(coreDust) => setData((current) => ({ ...current, profile: { ...current.profile, coreDust } }))} goNikkes={() => setPage("nikkes")} />
     : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} savedTeams={data.profile.savedTeams} onSavedTeamsChange={(savedTeams) => setData((current) => ({ ...current, profile: { ...current.profile, savedTeams } }))} />
-    : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} onDataChange={setData} onRefresh={refresh} />;
+    : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} connection={connection} syncState={syncState} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
 
   return <div className="app-shell">
     <div className="top-accent" />
