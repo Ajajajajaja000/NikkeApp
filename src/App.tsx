@@ -6,7 +6,7 @@ import { NikkePage } from "./pages/NikkePage";
 import { TeamsPage } from "./pages/TeamsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { fallbackCharacters } from "./data/fallback";
-import { extractBlablaId, fetchCatalog, importBlablaRoster, mergeImportedRecord } from "./api/nikkeApi";
+import { blablaErrorMessage, extractBlablaId, fetchCatalog, importBlablaRoster, mergeImportedRecord } from "./api/nikkeApi";
 import { useAppData } from "./hooks/useAppData";
 import { clearConnection, createConnection, loadConnection, saveConnection, shouldAutoSync } from "./blablaConnection";
 
@@ -69,7 +69,7 @@ export default function App() {
       setConnection(next);
       setSyncState(`${matches.length}体を取り込みました。手入力値は変更していません。`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "取り込みに失敗しました。";
+      const message = blablaErrorMessage(error);
       setConnection({ ...active, openid, lastAttemptAt: attemptedAt, lastError: message });
       setSyncState(message);
     } finally { syncing.current = false; }

@@ -3,6 +3,7 @@ import type { AppData, BlablaConnection, CharacterSummary } from "../types";
 import { createDefaultData, validateImport } from "../storage";
 import { sources } from "../data/sources";
 import { maskedOpenid } from "../blablaConnection";
+import { blablaErrorMessage } from "../api/nikkeApi";
 
 interface Props {
   data: AppData;
@@ -43,7 +44,7 @@ export function SettingsPage({ data, catalog, catalogStatus, connection, syncSta
   const connect = async () => {
     setImportState("");
     try { await onConnect(link); setLink(""); }
-    catch (error) { setImportState(error instanceof Error ? error.message : "共有URLを確認してください。"); }
+    catch (error) { setImportState(blablaErrorMessage(error)); }
   };
   const clear = () => {
     if (!window.confirm("この端末の所持・育成・保存編成をすべて削除します。JSONバックアップは作成しましたか？")) return;
