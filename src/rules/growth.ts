@@ -1,4 +1,6 @@
 import type { CollectionRecord, CoreDustState, CubeRecord, GearRecord, GearSlot, NikkeRecord } from "../types";
+import type { OverloadRecommendation } from "../data/overloadRecommendations";
+import { assessOverload, effectiveOverloadTargets } from "./overload";
 
 export function effectiveLevel(record: NikkeRecord | undefined): number {
   return record?.imported?.level ?? record?.level ?? 1;
@@ -56,5 +58,20 @@ export function growthShortages(record: NikkeRecord, recommendedSkills?: [number
   const skills = effectiveSkills(record);
   const skillGap = targetSkills.map((value, index) => Math.max(0, value - skills[index]));
   if (skillGap.some(Boolean)) shortages.push(`スキル不足 ${skillGap.join(" / ")}`);
+  return shortages;
+}
+
+export function growthStatus(record: NikkeRecord, recommendedSkills: [number, number, number] | undefined, overloadRecommendation: OverloadRecommendation | undefined) {
+  const shortages = growthShortages(record, recommendedSkills);
+  const targets = effectiveOverloadTargets(record, overloadRecommendation);
+  if (!targets.length) shortages.push("オバロ目標未設定");
+  else {
+    const result = assessOverload(record, targets);
+    const required = result.goals.filter((goal) => goal.kind !== "optional");
+    const unknown = required.filter((goal) => goal.unknown);
+    const missing = required.filter((goal) => !goal.met && !goal.unknown);
+    if (unknown.length) shortages.push(`オバロ数値を確認 ${unknown.length}項目`);
+    if (missing.length) shortages.push(`オバロ不足 ${missing.filter((goal) => goal.kind !== "avoid").length}項目${missing.some((goal) => goal.kind === "avoid") ? "・非推奨効果あり" : ""}`);
+  }
   return shortages;
 }

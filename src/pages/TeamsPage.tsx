@@ -1,12 +1,10 @@
 import { useMemo, useState } from "react";
 import { communityPurposes, communityTeams, type CommunityPurpose, type CommunityTeamMember } from "../data/communityTeams";
-import type { CharacterSummary, NikkeRecord, SavedTeam } from "../types";
+import type { CharacterSummary, NikkeRecord } from "../types";
 
 interface Props {
   catalog: CharacterSummary[];
   records: Record<string, NikkeRecord>;
-  savedTeams: SavedTeam[];
-  onSavedTeamsChange: (teams: SavedTeam[]) => void;
 }
 
 function resolveMember(member: CommunityTeamMember, catalog: CharacterSummary[]) {
@@ -14,7 +12,7 @@ function resolveMember(member: CommunityTeamMember, catalog: CharacterSummary[])
     ?? catalog.find((character) => character.name === member.name);
 }
 
-export function TeamsPage({ catalog, records, savedTeams, onSavedTeamsChange }: Props) {
+export function TeamsPage({ catalog, records }: Props) {
   const [purpose, setPurpose] = useState<CommunityPurpose>("campaign");
   const teams = useMemo(() => communityTeams
     .filter((team) => team.purpose === purpose)
@@ -24,23 +22,6 @@ export function TeamsPage({ catalog, records, savedTeams, onSavedTeamsChange }: 
       return { team, resolved, ownedCount };
     })
     .sort((a, b) => b.ownedCount - a.ownedCount), [purpose, catalog, records]);
-  const byId = Object.fromEntries(catalog.map((character) => [character.id, character]));
-
-  const save = (entry: (typeof teams)[number]) => {
-    const characterIds = entry.resolved.flatMap(({ character }) => character ? [character.id] : []);
-    if (characterIds.length !== entry.team.members.length) return;
-    const saved: SavedTeam = {
-      id: crypto.randomUUID(),
-      name: entry.team.title,
-      purpose: entry.team.purpose,
-      characterIds,
-      createdAt: new Date().toISOString(),
-      sourceUrl: entry.team.source.url,
-      sourceChecked: entry.team.source.checked,
-    };
-    onSavedTeamsChange([saved, ...savedTeams]);
-  };
-
   return <section className="page">
     <div className="page-title">
       <p className="eyebrow">COMMUNITY TEAMS</p>
@@ -63,7 +44,6 @@ export function TeamsPage({ catalog, records, savedTeams, onSavedTeamsChange }: 
     </div>
 
     {teams.map((entry) => {
-      const allResolved = entry.resolved.every(({ character }) => character);
       return <article className="panel community-team-card" key={entry.team.id}>
         <div className="suggestion-head">
           <div>
@@ -71,7 +51,6 @@ export function TeamsPage({ catalog, records, savedTeams, onSavedTeamsChange }: 
             <h2>{entry.team.title}</h2>
             <p className="readiness">所持 <strong>{entry.ownedCount}</strong> / 5</p>
           </div>
-          <button className="primary small" onClick={() => save(entry)} disabled={!allResolved}>この掲載編成を保存</button>
         </div>
 
         <div className="team-line" aria-label={`${entry.team.title}のメンバー`}>
@@ -104,16 +83,7 @@ export function TeamsPage({ catalog, records, savedTeams, onSavedTeamsChange }: 
           <span>確認日：{entry.team.source.checked.replaceAll("-", "/")}</span>
           <a href={entry.team.source.url} target="_blank" rel="noreferrer">{entry.team.source.title}で攻略を確認 ↗</a>
         </div>
-        {!allResolved && <p className="error-text">図鑑データと照合できないメンバーがいるため、保存は一時的に無効です。</p>}
       </article>;
     })}
-
-    {savedTeams.length > 0 && <>
-      <div className="section-heading"><div><p className="eyebrow">SAVED</p><h2>保存した掲載編成</h2><p className="muted">あとで見返すための控えです。メンバーは保存時の掲載編成から変更しません。</p></div></div>
-      <div className="saved-teams">{savedTeams.map((team) => <article className="saved-team" key={team.id}>
-        <div><h3>{team.name}</h3><p>{team.characterIds.map((id) => byId[id]?.name ?? records[id]?.displayName ?? id).join(" / ")}</p><small>{team.sourceUrl ? "掲載編成" : "旧版の編成メモ"} · 保存日時：{new Date(team.createdAt).toLocaleString("ja-JP")}</small></div>
-        <button className="danger-link" onClick={() => onSavedTeamsChange(savedTeams.filter((item) => item.id !== team.id))}>削除</button>
-      </article>)}</div>
-    </>}
   </section>;
 }

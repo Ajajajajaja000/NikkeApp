@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateCoreDust, coreDustForLevel, growthShortages } from "../src/rules/growth";
+import { calculateCoreDust, coreDustForLevel, growthShortages, growthStatus } from "../src/rules/growth";
 import { growthRecommendation } from "../src/data/growthRecommendations";
 
 describe("core dust calculator", () => {
@@ -35,5 +35,11 @@ describe("growth shortages", () => {
     expect(recommendation?.skills).toEqual([10, 10, 10]);
     const shortages = growthShortages({ owned: true, favorite: true, imported: { skills: [7, 10, 10], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } }, recommendation?.skills);
     expect(shortages).toEqual(["スキル不足 3 / 0 / 0"]);
+  });
+
+  it("必須オバロ目標の未達を育成目標に含める", () => {
+    const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test" }], cubes: [], checked: "2026-11-03", sources: [], classification: "Nikkers公開ビルド情報（静的確認）" });
+    expect(shortages).toContain("オバロ不足 1項目");
   });
 });

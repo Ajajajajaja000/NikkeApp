@@ -39,10 +39,27 @@ describe("overload display and goals", () => {
   });
 
   it("手動目標を公開推奨より優先し、装備ラインとの一致を判定する", () => {
-    const record: NikkeRecord = { owned: true, favorite: true, target: { overloadGoals: [{ effect: "有利コードダメージ増加", target: "2枠" }] } };
+    const record: NikkeRecord = { owned: true, favorite: true, target: { overloadGoals: [{ effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 2 }, priority: "required" }] } };
     const targets = effectiveOverloadTargets(record, overloadRecommendation(19, "マリアン：クイーン"));
-    expect(targets).toEqual([{ effect: "有利コードダメージ増加", target: "2枠" }]);
+    expect(targets).toEqual([{ effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 2 }, priority: "required" }]);
     expect(optionMatchesTargets("有利コードダメージ増加", targets)).toBe(true);
     expect(optionMatchesTargets("攻撃力増加", targets)).toBe(false);
+  });
+
+  it("割合目標を枠数と混同せず合計値で判定する", () => {
+    const record: NikkeRecord = { owned: true, favorite: true, imported: { gear: {
+      head: { tier: "OL", level: 5, overload: true, options: [{ name: "チャージ速度増加", value: 2.9, unit: "%" }] },
+      arms: { tier: "OL", level: 5, overload: true, options: [{ name: "チャージ速度増加", value: 2.5, unit: "%" }] },
+    }, fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
+    const result = assessOverload(record, [{ effect: "チャージ速度増加", condition: { type: "percent", minimum: 5.1 }, priority: "required" }]);
+    expect(result.goals[0]).toMatchObject({ current: 2, currentPercent: 5.4, minimum: 5.1, met: true });
+  });
+
+  it("付けない効果が存在すると未達にする", () => {
+    const record: NikkeRecord = { owned: true, favorite: true, imported: { gear: {
+      head: { tier: "OL", level: 5, overload: true, options: [{ name: "最大装弾数増加", value: 68.9, unit: "%" }] },
+    }, fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
+    const result = assessOverload(record, [{ effect: "最大装弾数増加", condition: { type: "absent" }, priority: "required" }]);
+    expect(result.goals[0]).toMatchObject({ kind: "avoid", current: 1, met: false });
   });
 });

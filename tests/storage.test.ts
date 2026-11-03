@@ -22,16 +22,29 @@ describe("backup schema", () => {
   });
 
   it("不正なバージョンを拒否する", () => {
-    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2または3/);
+    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2〜4/);
   });
 
-  it("バージョン2を3へ移行する", () => {
+  it("バージョン2を4へ移行する", () => {
     const old = { ...createDefaultData(), version: 2 };
     old.profile.records.x = { owned: true, favorite: false, skills: [1, 1, 1], cube: { name: "なし", level: 0 } };
     const migrated = validateImport(JSON.parse(JSON.stringify(old)));
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.profile.records.x.skills).toBeUndefined();
     expect(migrated.profile.records.x.cube).toBeUndefined();
+  });
+
+  it("バージョン3のオバロ目標を型付き条件へ移行し編成保存を削除する", () => {
+    const old = JSON.parse(JSON.stringify(createDefaultData()));
+    old.version = 3;
+    old.profile.savedTeams = [{ id: "old" }];
+    old.profile.records.x = { owned: true, favorite: true, target: { overloadGoals: [{ effect: "チャージ速度増加", target: "合計約5.1%以上" }, { effect: "最大装弾数増加", target: "避ける" }] } };
+    const migrated = validateImport(old);
+    expect(migrated.profile).not.toHaveProperty("savedTeams");
+    expect(migrated.profile.records.x.target?.overloadGoals).toEqual([
+      { effect: "チャージ速度増加", condition: { type: "percent", minimum: 5.1 }, priority: "required" },
+      { effect: "最大装弾数増加", condition: { type: "absent" }, priority: "required" },
+    ]);
   });
 
   it("再読み込み相当でも所持・手入力記録を復元する", () => {

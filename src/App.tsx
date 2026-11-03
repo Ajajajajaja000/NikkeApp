@@ -114,7 +114,7 @@ export default function App() {
   const navigate = (next: PageId) => { if (next !== "nikkes") setFocusedNikkeId(""); setPage(next); };
   const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} lastBlablaImport={data.blablaMeta?.fetchedAt} goNikkes={openNikkes} />
     : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} filters={nikkeFilters} initialOpenId={focusedNikkeId || undefined} onFiltersChange={setNikkeFilters} onClearFocus={() => setFocusedNikkeId("")} onRecordChange={updateRecord} />
-    : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} savedTeams={data.profile.savedTeams} onSavedTeamsChange={(savedTeams) => setData((current) => ({ ...current, profile: { ...current.profile, savedTeams } }))} />
+    : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} />
     : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
 
   return <div className="app-shell">

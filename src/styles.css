@@ -181,8 +181,10 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .overload-goal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .danger-text { color: #ff9caf !important; }
 .overload-goal-editor { display: grid; gap: 7px; margin: 12px 0; border: 1px solid rgba(94,234,212,.22); border-radius: 10px; padding: 9px; background: rgba(94,234,212,.035); }
-.overload-goal-edit-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(90px, .8fr) 44px; gap: 6px; }
+.overload-goal-edit-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(125px, .9fr) minmax(90px, .6fr) minmax(84px, .55fr) 44px; gap: 6px; align-items: center; }
 .overload-goal-edit-row select, .overload-goal-edit-row input { min-width: 0; }
+.overload-number { display: flex; align-items: center; gap: 5px; }
+.overload-number input { width: 100%; }
 .icon-button { min-width: 44px; min-height: 44px; border: 1px solid #49313a; border-radius: 8px; color: #ff9caf; background: #211319; font-size: 1.1rem; }
 .add-goal { justify-self: start; }
 .edit-decision-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -251,10 +253,6 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .community-source { display: flex; justify-content: space-between; gap: 9px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 16px; padding-top: 13px; }
 .community-source span { color: var(--muted); font-size: .7rem; }
 .community-source a { font-size: .78rem; font-weight: 700; }
-.saved-teams { display: grid; gap: 8px; }
-.saved-team { display: flex; justify-content: space-between; gap: 12px; border: 1px solid var(--line); border-radius: 13px; padding: 14px; background: var(--panel); }
-.saved-team > div { min-width: 0; }
-.saved-team p, .saved-team small { margin: 0; color: var(--muted); overflow-wrap: anywhere; font-size: .78rem; }
 
 .status-row, .button-row, .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .status-row span { border-radius: 7px; padding: 6px 8px; color: var(--muted); background: #0a0f17; font-size: .72rem; }
@@ -312,8 +310,8 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   .equipment-grid { grid-template-columns: 1fr; }
   .overload-goal-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .overload-goal-edit-row { grid-template-columns: minmax(0, 1fr) 44px; }
-  .overload-goal-edit-row input { grid-column: 1; }
-  .overload-goal-edit-row .icon-button { grid-column: 2; grid-row: 1 / 3; }
+  .overload-goal-edit-row > select, .overload-goal-edit-row .overload-number { grid-column: 1; }
+  .overload-goal-edit-row .icon-button { grid-column: 2; grid-row: 1 / 5; }
   .suggestion-head .primary { width: 100%; }
   .panel { padding: 15px; }
   .panel-head { align-items: start; }
