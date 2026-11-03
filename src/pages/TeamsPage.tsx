@@ -80,6 +80,7 @@ export function TeamsPage({ catalog, records }: Props) {
           <h3>掲載元にある代替例</h3>
           <ul>{entry.team.substitutions.map((item) => <li key={item}>{item}</li>)}</ul>
         </div>}
+        <p className="verification-note"><strong>複数ソース照合：</strong>{entry.team.verification}</p>
         <div className="community-source">
           <span>掲載元更新日：{entry.team.source.updated.replaceAll("-", "/")}</span>
           <span>確認日：{entry.team.source.checked.replaceAll("-", "/")}</span>

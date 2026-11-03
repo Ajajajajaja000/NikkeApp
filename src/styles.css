@@ -253,6 +253,8 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .community-source { display: flex; justify-content: space-between; gap: 9px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 16px; padding-top: 13px; }
 .community-source span { color: var(--muted); font-size: .7rem; }
 .community-source a { font-size: .78rem; font-weight: 700; }
+.verification-note { margin: 14px 0 0; padding: 10px 12px; border: 1px solid rgba(106, 208, 255, .22); border-radius: 10px; background: rgba(106, 208, 255, .06); color: #b8c4d4; font-size: .76rem !important; line-height: 1.55; }
+.verification-note strong { color: #d9f3ff; }
 
 .status-row, .button-row, .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .status-row span { border-radius: 7px; padding: 6px 8px; color: var(--muted); background: #0a0f17; font-size: .72rem; }

@@ -10,7 +10,7 @@ export interface CommunityTeamMember { resourceId: number; name: string; treasur
 export interface CommunityTeam {
   id: string; purpose: CommunityPurpose; title: string; members: CommunityTeamMember[];
   playStyle: "フルオート候補" | "手動推奨"; orderNote: string; summary: string;
-  notes: string[]; substitutions: string[];
+  notes: string[]; substitutions: string[]; verification: string;
   source: { title: string; url: string; updated: string; checked: string };
 }
 
@@ -18,6 +18,7 @@ const checked = "2026-11-03";
 const prydwenSource = { title: "Prydwen — Story Meta Teams", url: "https://www.prydwen.gg/nikke/guides/meta-teams", updated: "2026-11-02", checked };
 const gameWithSource = { title: "GameWith — 最強パーティー編成まとめ", url: "https://gamewith.jp/nikke/article/show/376374", updated: "2026-11-03", checked };
 const anomalySource = (title: string, path: string) => ({ title: `NIKKE.GG — ${title}`, url: `https://nikke.gg/${path}/`, updated: "2026-10-12", checked });
+const gameWithBossSource = (title: string, article: string, updated: string) => ({ title: `GameWith — ${title}`, url: `https://gamewith.jp/nikke/article/show/${article}`, updated, checked });
 
 // 公開攻略に掲載された完成編成だけを収録し、アプリ側で別編成へ組み替えない。
 export const communityTeams: CommunityTeam[] = [
@@ -25,78 +26,73 @@ export const communityTeams: CommunityTeam[] = [
     id: "gamewith-all-round", purpose: "campaign", title: "最新オールラウンド編成",
     members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 223, name: "ナユタ" }, { resourceId: 19, name: "マリアン：クイーン" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 330, name: "クラウン" }],
     playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "高火力と回復のバランスを取った、2026年11月3日更新の汎用完成編成です。",
-    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "マリアン：クイーンまで反映された最新の掲載例です。"], substitutions: [], source: gameWithSource,
+    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "マリアン：クイーンまで反映された最新の掲載例です。"], substitutions: [], verification: "GameWithの完成形を採用。PrydwenとNIKKE.GGの最新評価でも主要メンバーの役割を確認。", source: gameWithSource,
   },
   {
     id: "gamewith-pilgrim-os", purpose: "campaign", title: "最新ピルグリム＆オーバースペック編成",
     members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 223, name: "ナユタ" }, { resourceId: 19, name: "マリアン：クイーン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 330, name: "クラウン" }],
     playStyle: "フルオート候補", orderNote: "GameWithの掲載順です。", summary: "クラウンの防御・火力支援と強力なアタッカーを組み合わせた、2026年11月3日更新の完成編成です。",
-    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "雑魚処理と最終ボスの両方を意識した掲載例です。"], substitutions: [], source: gameWithSource,
+    notes: ["掲載元はキャンペーン専用・フルオート保証とはしていないため、ステージに応じて手動操作してください。", "雑魚処理と最終ボスの両方を意識した掲載例です。"], substitutions: [], verification: "GameWithの完成形を採用。PrydwenとNIKKE.GGの最新評価でも主要メンバーの役割を確認。", source: gameWithSource,
   },
   {
     id: "prydwen-story-team-38", purpose: "campaign", title: "高戦力差：宝ものヘルム編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 94, name: "ベスティー：タクティカル・アップ" }, { resourceId: 16, name: "ラピ：レッドフード" }],
     playStyle: "手動推奨", orderNote: "Prydwenの掲載順です。", summary: "戦力差45〜50%帯のGod Comp #1として掲載された、超高難度向け編成です。",
-    notes: ["高水準の育成、オバロ、有利属性、手動操作を前提とします。", "ステージごとの敵配置とバーストタイミングを確認してください。"], substitutions: [], source: prydwenSource,
+    notes: ["高水準の育成、オバロ、有利属性、手動操作を前提とします。", "ステージごとの敵配置とバーストタイミングを確認してください。"], substitutions: [], verification: "Prydwenの完成形を採用。GameWithの最新灼熱編成と主要4枠が一致。", source: prydwenSource,
   },
   {
     id: "kraken-nayuta", purpose: "kraken", title: "ナユタ・リバーレリオ編成",
     members: [{ resourceId: 513, name: "リトルマーメイド" }, { resourceId: 223, name: "ナユタ" }, { resourceId: 262, name: "リバーレリオ" }, { resourceId: 225, name: "紅蓮：ブラックシャドウ" }, { resourceId: 330, name: "クラウン" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "風圧の主力を集めたクラーケン向け掲載編成です。", notes: ["赤丸処理と被弾管理のため手動確認を前提にします。"], substitutions: [], source: anomalySource("Anomaly Interception: Kraken", "anomaly-interception-kraken"),
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "風圧の主力を集めたクラーケン向け掲載編成です。", notes: ["赤丸処理と被弾管理のため手動確認を前提にします。"], substitutions: [], verification: "GameWithとNIKKE.GGで同じ5人を確認。Prydwenでも同じ中核を最上位候補として掲載。", source: gameWithBossSource("クラーケン攻略", "461435", "2026-10-21"),
   },
   {
     id: "kraken-alice", purpose: "kraken", title: "アリス編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 225, name: "紅蓮：ブラックシャドウ" }, { resourceId: 191, name: "アリス" }, { resourceId: 513, name: "リトルマーメイド" }, { resourceId: 352, name: "ヘルム", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "紅蓮：ブラックシャドウとアリスを組み合わせた掲載編成です。", notes: ["アリスの速射と赤丸処理を含む手動操作を前提にします。"], substitutions: [], source: anomalySource("Anomaly Interception: Kraken", "anomaly-interception-kraken"),
+    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "紅蓮：ブラックシャドウとアリスを組み合わせた掲載編成です。", notes: ["アリスの速射と赤丸処理を含む手動操作を前提にします。"], substitutions: [], verification: "NIKKE.GGの完成形を採用。Prydwenでも紅蓮：ブラックシャドウ、アリス、クラウンを有力候補として確認。", source: anomalySource("Anomaly Interception: Kraken", "anomaly-interception-kraken"),
   },
   {
     id: "kraken-asuka", purpose: "kraken", title: "アスカ：WILLE編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 225, name: "紅蓮：ブラックシャドウ" }, { resourceId: 835, name: "アスカ：WILLE" }, { resourceId: 513, name: "リトルマーメイド" }, { resourceId: 352, name: "ヘルム", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "アスカ：WILLEを採用したクラーケン向け掲載編成です。", notes: ["赤丸処理と被弾管理のため手動確認を前提にします。"], substitutions: [], source: anomalySource("Anomaly Interception: Kraken", "anomaly-interception-kraken"),
+    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "アスカ：WILLEを採用したクラーケン向け掲載編成です。", notes: ["赤丸処理と被弾管理のため手動確認を前提にします。"], substitutions: [], verification: "NIKKE.GGの完成形を採用。Prydwenでもアスカ：WILLEを有力な風圧アタッカーとして確認。", source: anomalySource("Anomaly Interception: Kraken", "anomaly-interception-kraken"),
   },
   {
-    id: "mirror-mast", purpose: "mirror", title: "マスト：ロマンチックメイド編成",
-    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 511, name: "シンデレラ" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "シンデレラを中心にした電撃寄りの掲載編成です。", notes: ["ガラスの靴と電撃限定の赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Mirror Container", "anomaly-interception-mirror-container"),
+    id: "mirror-electric", purpose: "mirror", title: "電撃特化型火力編成",
+    members: [{ resourceId: 511, name: "シンデレラ" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 15, name: "アニス：スパークリングサマー" }, { resourceId: 330, name: "クラウン" }, { resourceId: 183, name: "メイデン：アイスローズ" }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "有利属性の電撃アタッカーと電撃支援を集めた最新掲載編成です。", notes: ["ガラスの靴と電撃限定の赤丸を手動で処理します。", "限定キャラを含むため、未所持の場合は掲載元の代用候補を確認してください。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenの最新チーム例でも同じ5人を中核候補として確認。", source: gameWithBossSource("ミラーコンテナ攻略", "458118", "2026-10-26"),
   },
   {
-    id: "mirror-privaty", purpose: "mirror", title: "プリバティ（宝もの）編成",
-    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 511, name: "シンデレラ" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 170, name: "プリバティ", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "宝ものプリバティを採用したミラーコンテナ向け掲載編成です。", notes: ["ガラスの靴と電撃限定の赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Mirror Container", "anomaly-interception-mirror-container"),
+    id: "mirror-gimmick", purpose: "mirror", title: "ガラスの靴対策編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 18, name: "ネオン：ビジョン・アイ" }, { resourceId: 840, name: "エイダ" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "一撃火力を重視し、ガラスの靴の破壊を狙う最新掲載編成です。", notes: ["ガラスの靴が露出する直前にアタッカー以外をハイドさせます。", "エイダはコラボ限定キャラです。"], substitutions: [], verification: "GameWithの完成形を採用。Prydwenでも同じ中核4人とマストの運用を確認。", source: gameWithBossSource("ミラーコンテナ攻略", "458118", "2026-10-26"),
   },
   {
-    id: "indivilla-diesel", purpose: "indivilla", title: "ディーゼル：ウィンタースイーツ編成",
-    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 75, name: "ディーゼル：ウィンタースイーツ" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "ラピ：レッドフードを主力にした掲載編成です。", notes: ["フェーズ移行時のレーザーにクラウンの無敵を合わせます。"], substitutions: [], source: anomalySource("Anomaly Interception: Indivilia", "anomaly-interception-indivilia"),
+    id: "indivilla-balanced", purpose: "indivilla", title: "耐久・火力バランス編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 352, name: "ヘルム" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "クラウンのバリアとヘルムの回復を備えた、灼熱主力の最新掲載編成です。", notes: ["3回に1回マストのバーストを使う運用が紹介されています。", "フェーズ移行時の攻撃に合わせて防御を管理します。"], substitutions: [], verification: "GameWithの完成形を採用。NIKKE.GGの主要編成と中核4人が一致。", source: gameWithBossSource("インディビリア攻略", "461602", "2026-10-27"),
   },
   {
     id: "indivilla-mihara", purpose: "indivilla", title: "ミハラ：ボンディングチェーン編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 162, name: "ミハラ：ボンディングチェーン" }, { resourceId: 450, name: "ナガ" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "ミハラ：ボンディングチェーンとナガを採用した掲載編成です。", notes: ["フェーズ移行時の攻撃とバーストタイミングを管理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Indivilia", "anomaly-interception-indivilia"),
+    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "ミハラ：ボンディングチェーンとナガを採用した掲載編成です。", notes: ["フェーズ移行時の攻撃とバーストタイミングを管理します。"], substitutions: [], verification: "NIKKE.GGの完成形を採用。GameWithでもミハラをラピ枠の代用候補として確認。", source: anomalySource("Anomaly Interception: Indivilia", "anomaly-interception-indivilia"),
   },
   {
     id: "ultra-mast", purpose: "ultra", title: "マスト：ロマンチックメイド編成",
-    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 470, name: "レッドフード" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "鉄甲アタッカー2人を使うウルトラ向け掲載編成です。", notes: ["ポイズンチャンバー、コア、属性赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Ultra", "anomaly-interception-ultra"),
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 470, name: "レッドフード" }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "クラウンのバリアで攻撃を受けつつ、火力も確保する安定型掲載編成です。", notes: ["ポイズンチャンバー、コア、属性赤丸を手動で処理します。"], substitutions: [], verification: "GameWithとNIKKE.GGで同じ5人を確認。", source: gameWithBossSource("ウルトラ攻略", "424570", "2026-10-14"),
   },
   {
     id: "ultra-privaty", purpose: "ultra", title: "プリバティ（宝もの）編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 470, name: "レッドフード" }, { resourceId: 16, name: "ラピ：レッドフード" }, { resourceId: 170, name: "プリバティ", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "宝ものプリバティを採用したウルトラ向け掲載編成です。", notes: ["ポイズンチャンバー、コア、属性赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Ultra", "anomaly-interception-ultra"),
+    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "宝ものプリバティを採用したウルトラ向け掲載編成です。", notes: ["ポイズンチャンバー、コア、属性赤丸を手動で処理します。"], substitutions: [], verification: "NIKKE.GGの完成形を採用。GameWithでもプリバティを同枠の代用候補として確認。", source: anomalySource("Anomaly Interception: Ultra", "anomaly-interception-ultra"),
   },
   {
-    id: "harvester-privaty", purpose: "harvester", title: "プリバティ（宝もの）編成",
-    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 170, name: "プリバティ", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "水冷火力と宝もの支援を使う掲載編成です。", notes: ["部位、コア、属性赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Harvester", "anomaly-interception-harvester"),
+    id: "harvester-balanced", purpose: "harvester", title: "耐久・火力バランス編成",
+    members: [{ resourceId: 17, name: "アニス：スター" }, { resourceId: 330, name: "クラウン" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 234, name: "ドロシー：セレンディピティ" }, { resourceId: 352, name: "ヘルム", treasure: true }],
+    playStyle: "手動推奨", orderNote: "GameWithの掲載順です。", summary: "水冷火力、部位破壊、回復を揃えた最新掲載編成です。", notes: ["部位、コア、属性赤丸を手動で処理します。", "ヘルムは宝もの解放を前提とする掲載例です。"], substitutions: [], verification: "GameWithの完成形を採用。NIKKE.GGとPrydwenでも主要メンバーの役割を確認。", source: gameWithBossSource("ハーベスター攻略", "461776", "2026-10-14"),
   },
   {
     id: "harvester-mast", purpose: "harvester", title: "マスト：ロマンチックメイド編成",
     members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 17, name: "アニス：スター" }, { resourceId: 471, name: "スノーホワイト：ヘビーアームズ" }, { resourceId: 352, name: "ヘルム", treasure: true }, { resourceId: 354, name: "マスト：ロマンチックメイド" }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "マスト：ロマンチックメイドを採用した掲載編成です。", notes: ["部位、コア、属性赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Harvester", "anomaly-interception-harvester"),
-  },
-  {
-    id: "harvester-ludmilla", purpose: "harvester", title: "ルドミラ：ウィンターオーナー編成",
-    members: [{ resourceId: 330, name: "クラウン" }, { resourceId: 234, name: "ドロシー：セレンディピティ" }, { resourceId: 513, name: "リトルマーメイド" }, { resourceId: 194, name: "ルドミラ：ウィンターオーナー" }, { resourceId: 352, name: "ヘルム", treasure: true }],
-    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "ルドミラ：ウィンターオーナーを採用した掲載編成です。", notes: ["部位、コア、属性赤丸を手動で処理します。"], substitutions: [], source: anomalySource("Anomaly Interception: Harvester", "anomaly-interception-harvester"),
+    playStyle: "手動推奨", orderNote: "NIKKE.GGの掲載順です。", summary: "マスト：ロマンチックメイドを採用した掲載編成です。", notes: ["部位、コア、属性赤丸を手動で処理します。"], substitutions: [], verification: "NIKKE.GGの完成形を採用。GameWithでもアニス：スター、クラウン、スノーホワイト：ヘビーアームズ、ヘルムを中核として確認し、マストは代用候補に掲載。", source: anomalySource("Anomaly Interception: Harvester", "anomaly-interception-harvester"),
   },
 ];
