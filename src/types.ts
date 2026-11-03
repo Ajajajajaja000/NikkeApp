@@ -134,7 +134,7 @@ export interface BlablaConnection {
   openid: string;
   area?: number;
   autoSync: boolean;
-  intervalHours: 72;
+  intervalHours: 168;
   lastAttemptAt?: string;
   lastSuccessAt?: string;
   lastCount?: number;

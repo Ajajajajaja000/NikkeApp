@@ -82,6 +82,7 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .shortage-list { grid-column: 2; display: flex; gap: 6px; flex-wrap: wrap; }
 .shortage-list span, .alternative-list span { color: #ffd08a; background: rgba(255,181,71,.09); border: 1px solid rgba(255,181,71,.2); border-radius: 99px; padding: 5px 9px; font-size: .72rem; }
 .shortage-list .complete { color: var(--teal); border-color: rgba(94,234,212,.25); background: rgba(94,234,212,.08); }
+.growth-open-button { grid-column: 2; justify-self: start; }
 .growth-details { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; }
 .growth-details > summary { min-height: 44px; display: flex; align-items: center; color: var(--teal); cursor: pointer; font-size: .82rem; font-weight: 700; }
 
@@ -177,11 +178,15 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .overload-goal h4 { margin-top: 0; }
 .overload-goal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .overload-goal-head h4 { margin-bottom: 10px; }
+.overload-goal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.danger-text { color: #ff9caf !important; }
 .overload-goal-editor { display: grid; gap: 7px; margin: 12px 0; border: 1px solid rgba(94,234,212,.22); border-radius: 10px; padding: 9px; background: rgba(94,234,212,.035); }
 .overload-goal-edit-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(90px, .8fr) 44px; gap: 6px; }
 .overload-goal-edit-row select, .overload-goal-edit-row input { min-width: 0; }
 .icon-button { min-width: 44px; min-height: 44px; border: 1px solid #49313a; border-radius: 8px; color: #ff9caf; background: #211319; font-size: 1.1rem; }
 .add-goal { justify-self: start; }
+.edit-decision-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.edit-decision-row button { flex: 1 1 130px; }
 .overload-goal-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .overload-goal-stats span { min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 8px; background: rgba(7,10,15,.72); }
 .overload-goal-stats small, .overload-goal-stats strong { display: block; }

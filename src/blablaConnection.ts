@@ -4,7 +4,7 @@ export const BLABLA_CONNECTION_KEY = "nikke-compass:blabla-connection";
 const RETRY_HOURS = 6;
 
 export function createConnection(openid: string): BlablaConnection {
-  return { version: 1, openid, autoSync: true, intervalHours: 72 };
+  return { version: 1, openid, autoSync: true, intervalHours: 168 };
 }
 
 export function loadConnection(): BlablaConnection | null {
@@ -16,7 +16,8 @@ export function loadConnection(): BlablaConnection | null {
       localStorage.removeItem(BLABLA_CONNECTION_KEY);
       return null;
     }
-    return { ...value, autoSync: value.autoSync !== false, intervalHours: 72 } as BlablaConnection;
+    // 旧版の3日設定も、読込時に現在仕様の7日へ統一する。
+    return { ...value, autoSync: value.autoSync !== false, intervalHours: 168 } as BlablaConnection;
   } catch { return null; }
 }
 

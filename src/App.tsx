@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BlablaConnection, CharacterSummary, NikkeRecord } from "./types";
 import { BottomNav, type PageId } from "./components/BottomNav";
 import { HomePage } from "./pages/HomePage";
-import { NikkePage } from "./pages/NikkePage";
+import { NikkePage, type NikkeFilters } from "./pages/NikkePage";
 import { TeamsPage } from "./pages/TeamsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { fallbackCharacters } from "./data/fallback";
@@ -19,6 +19,8 @@ export default function App() {
   const [connection, setConnectionState] = useState<BlablaConnection | null>(() => loadConnection());
   const [syncState, setSyncState] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
+  const [focusedNikkeId, setFocusedNikkeId] = useState("");
+  const [nikkeFilters, setNikkeFilters] = useState<NikkeFilters>({ query: "", owned: "all", element: "all", corporation: "all", weapon: "all", burst: "all" });
   const syncing = useRef(false);
   const catalogRequest = useRef<Promise<CharacterSummary[]> | null>(null);
 
@@ -108,8 +110,10 @@ export default function App() {
   }, [connection, syncBlabla]);
 
   const updateRecord = (id: string, record: NikkeRecord) => setData((current) => ({ ...current, profile: { ...current.profile, records: { ...current.profile.records, [id]: record } } }));
-  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} lastBlablaImport={data.blablaMeta?.fetchedAt} goNikkes={() => setPage("nikkes")} />
-    : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} onRecordChange={updateRecord} />
+  const openNikkes = (characterId?: string) => { setFocusedNikkeId(characterId ?? ""); setPage("nikkes"); };
+  const navigate = (next: PageId) => { if (next !== "nikkes") setFocusedNikkeId(""); setPage(next); };
+  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} lastBlablaImport={data.blablaMeta?.fetchedAt} goNikkes={openNikkes} />
+    : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} filters={nikkeFilters} initialOpenId={focusedNikkeId || undefined} onFiltersChange={setNikkeFilters} onClearFocus={() => setFocusedNikkeId("")} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} savedTeams={data.profile.savedTeams} onSavedTeamsChange={(savedTeams) => setData((current) => ({ ...current, profile: { ...current.profile, savedTeams } }))} />
     : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
 
@@ -117,6 +121,6 @@ export default function App() {
     <div className="top-accent" />
     <main>{content}</main>
     {saveError && <div className="save-error" role="alert">{saveError}</div>}
-    <BottomNav page={page} onChange={setPage} />
+    <BottomNav page={page} onChange={navigate} />
   </div>;
 }

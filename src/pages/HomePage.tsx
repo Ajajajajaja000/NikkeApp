@@ -9,7 +9,7 @@ interface Props {
   catalog: CharacterSummary[];
   records: Record<string, NikkeRecord>;
   lastBlablaImport?: string;
-  goNikkes: () => void;
+  goNikkes: (characterId?: string) => void;
 }
 
 export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props) {
@@ -25,8 +25,8 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
     </header>
     <p className="blabla-date">BlablaLinkからデータ取り込み日時：{lastBlablaImport ? new Date(lastBlablaImport).toLocaleString("ja-JP") : "未取得"}</p>
 
-    <div className="section-heading"><div><p className="eyebrow">PRIORITY</p><h2>育成対象</h2></div><button className="text-button" onClick={goNikkes}>ニケ一覧へ</button></div>
-    {favorites.length === 0 ? <div className="empty-state"><span>◎</span><h3>育成対象はまだありません</h3><p>ニケ一覧で「育成対象にする」を押すと、不足と詳細をここで追跡できます。</p><button className="primary" onClick={goNikkes}>ニケを選ぶ</button></div> :
+    <div className="section-heading"><div><p className="eyebrow">PRIORITY</p><h2>育成対象</h2></div><button className="text-button" onClick={() => goNikkes()}>ニケ一覧へ</button></div>
+    {favorites.length === 0 ? <div className="empty-state"><span>◎</span><h3>育成対象はまだありません</h3><p>ニケ一覧で「育成対象にする」を押すと、不足と詳細をここで追跡できます。</p><button className="primary" onClick={() => goNikkes()}>ニケを選ぶ</button></div> :
       <div className="growth-grid">{favorites.map((character, index) => {
         const record = records[character.id];
         const shortages = record.imported ? growthShortages(record, growthRecommendation(character.resourceId)?.skills) : ["BlablaLink未取込"];
@@ -35,6 +35,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
           <div className="rank">{String(index + 1).padStart(2, "0")}</div>
           <div><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {character.element} · B{character.bursts.join("/") || "?"}</p></div>
           <div className="shortage-list">{shortages.length ? shortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}</div>
+          <button className="secondary growth-open-button" onClick={() => goNikkes(character.id)}>ニケ一覧で詳細を見る</button>
           <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} overloadTargets={overloadTargets} /></details>
         </article>;
       })}</div>}
