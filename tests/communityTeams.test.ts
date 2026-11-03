@@ -31,4 +31,10 @@ describe("communityTeams", () => {
     const members = communityTeams.filter((item) => item.purpose === "campaign").flatMap((item) => item.members);
     expect(members.some((member) => member.name === "モダニア")).toBe(false);
   });
+
+  it("キャンペーンは最新汎用編成と高戦力差向け編成を収録する", () => {
+    expect(communityTeams.filter((item) => item.purpose === "campaign").map((item) => item.id)).toEqual([
+      "gamewith-all-round", "gamewith-pilgrim-os", "prydwen-story-team-38",
+    ]);
+  });
 });
