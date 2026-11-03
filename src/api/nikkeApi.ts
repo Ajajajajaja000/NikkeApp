@@ -75,7 +75,7 @@ export async function fetchCatalog(signal?: AbortSignal): Promise<CharacterSumma
   const json = obj(await getJson(`${API_BASE}/api/nikkes?lang=ja&limit=500&fields=${encodeURIComponent(fields)}`, signal));
   const characters = Array.isArray(json.characters) ? json.characters : [];
   if (characters.length === 0) throw new Error("キャラ一覧が空でした。");
-  return characters.map(normalizeCharacter).sort((a, b) => a.name.localeCompare(b.name, "ja"));
+  return characters.map(normalizeCharacter);
 }
 
 export async function fetchCharacterDetail(id: string, signal?: AbortSignal): Promise<CharacterDetail> {

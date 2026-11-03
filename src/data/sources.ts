@@ -57,6 +57,24 @@ export const sources = [
     title: "Prydwen — Anomaly Interception",
     url: "https://www.prydwen.gg/nikke/guides/game-modes-anomaly-interception",
     checked: "2026-11-03",
-    note: "異常個体5ボスの属性、有利・不利属性と一般的注意点の確認に使用。編成提案自体は本アプリ独自ルール。",
+    note: "異常個体5ボスの属性、有利・不利属性と一般的注意点の確認に使用。",
+  },
+  {
+    title: "Prydwen — Teams Database",
+    url: "https://www.prydwen.gg/nikke/teams-database",
+    checked: "2026-11-03",
+    note: "キャンペーン用の完成編成、運用説明、掲載元が示す代替例を確認。アプリ側で欠員補完や独自編成は行わない。",
+  },
+  {
+    title: "NIKKE.GG — Anomaly Interception Guides",
+    url: "https://nikke.gg/anomaly-interception-kraken/",
+    checked: "2026-11-03",
+    note: "異常個体5ボスのBest Teamsと手動操作上の注意を確認。各編成カードからボス別の原文へ移動できる。",
+  },
+  {
+    title: "GachaTracker — NIKKE Characters",
+    url: "https://www.gachatracker.app/games/nikke/characters/",
+    checked: "2026-11-03",
+    note: "ニケ一覧の実装日順を静的に確認。ブラウザ実行時には取得せず、未登録の新キャラは一覧先頭に表示する。",
   },
 ];

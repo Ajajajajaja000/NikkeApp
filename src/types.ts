@@ -94,6 +94,8 @@ export interface SavedTeam {
   purpose: string;
   characterIds: string[];
   createdAt: string;
+  sourceUrl?: string;
+  sourceChecked?: string;
 }
 
 export interface CoreDustState {
@@ -129,14 +131,4 @@ export interface BlablaConnection {
   lastSuccessAt?: string;
   lastCount?: number;
   lastError?: string;
-}
-
-export interface TeamSuggestion {
-  title: string;
-  characterIds: string[];
-  referenceCharacterIds: string[];
-  mode: "フルオート向け" | "手動推奨" | "編成不足";
-  reasons: string[];
-  cautions: string[];
-  alternatives: string[];
 }

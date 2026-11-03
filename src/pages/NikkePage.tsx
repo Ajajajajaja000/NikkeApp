@@ -47,7 +47,7 @@ export function NikkePage({ catalog, records, onRecordChange }: Props) {
   const update = (character: CharacterSummary, patch: Partial<NikkeRecord>) => onRecordChange(character.id, mergeRecord(records[character.id], { ...patch, displayName: character.name }));
 
   return <section className="page">
-    <div className="page-title"><p className="eyebrow">ROSTER</p><h1>ニケ一覧</h1><p>{filtered.length} / {catalog.length}体を表示</p></div>
+    <div className="page-title"><p className="eyebrow">ROSTER</p><h1>ニケ一覧</h1><p>{filtered.length} / {catalog.length}体を実装が新しい順で表示</p></div>
     <div className="filter-panel">
       <label className="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="日本語名で検索" value={query} onChange={(e) => { setQuery(e.target.value); setLimit(40); }} /></label>
       <div className="filters">

@@ -1,4 +1,5 @@
 import type { BurstStage, CharacterSummary, NikkeRecord } from "../types";
+import { compareByReleaseOrder } from "../data/releaseOrder";
 
 export interface RosterFilters {
   query: string;
@@ -19,5 +20,5 @@ export function filterCharacters(characters: CharacterSummary[], records: Record
       && (filters.corporation === "all" || character.corporation === filters.corporation)
       && (filters.weapon === "all" || character.weapon === filters.weapon)
       && (filters.burst === "all" || character.bursts.includes(filters.burst));
-  });
+  }).sort((a, b) => compareByReleaseOrder(a.resourceId, b.resourceId));
 }
