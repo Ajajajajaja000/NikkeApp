@@ -1,11 +1,15 @@
 export interface GrowthRecommendation {
   skills: [number, number, number];
   checked: string;
-  sourceUrl: string;
+  sources: Array<{ label: string; url: string }>;
+  agreement: "複数ソース一致" | "単一ソース参考";
+  note?: string;
 }
 
-const checked = "2026-11-03";
-const sourceUrl = "https://nikkers.cc/api";
+const checked = "2026-11-04";
+const nikkersSource = { label: "Nikkers API", url: "https://nikkers.cc/api" };
+const prydwenSource = { label: "Prydwen Character Builds", url: "https://www.prydwen.gg/nikke/builds" };
+const nikkeGgSource = { label: "NIKKE.GG Skill Priority", url: "https://nikke.gg/skill-priority-guide/" };
 
 // Nikkers公開APIの推奨値を、開発時の手動コマンド1回で更新した静的データ。
 // アプリ利用中はNikkersへ通信せず、resourceIdで別衣装も厳密に区別する。
@@ -207,10 +211,32 @@ const skillTargets: Record<number, [number, number, number]> = {
   872: [1,1,1],
 };
 
+// 2つ以上の公開攻略で同じ最終目標を確認できたキャラだけを優先採用する。
+// 攻略元で段階目標が異なる場合は、同じ値が複数回現れた方を採用し、差異を注記する。
+const consensusTargets: Record<number, Omit<GrowthRecommendation, "checked">> = {
+  16: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  17: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, nikkeGgSource], note: "Prydwenはバースト7を実用到達点として掲載しています。" },
+  19: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  183: { skills: [7,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  191: { skills: [10,4,10], agreement: "複数ソース一致", sources: [prydwenSource, nikkeGgSource], note: "Nikkersの値はスキル2を7とするため、2ソースで一致した4を採用しています。" },
+  330: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  451: { skills: [10,4,4], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  470: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  601: { skills: [7,7,7], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+};
+
 export function growthRecommendation(resourceId: number | undefined): GrowthRecommendation | undefined {
   if (resourceId === undefined) return undefined;
+  const consensus = consensusTargets[resourceId];
+  if (consensus) return { ...consensus, checked };
   const skills = skillTargets[resourceId];
-  return skills ? { skills, checked, sourceUrl } : undefined;
+  return skills ? {
+    skills,
+    checked,
+    sources: [nikkersSource],
+    agreement: "単一ソース参考",
+    note: "複数攻略で同じ目標値を確認できていないため、参考値として表示しています。",
+  } : undefined;
 }
 
 export const growthRecommendationCount = Object.keys(skillTargets).length;

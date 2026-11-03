@@ -4,23 +4,24 @@ export interface OverloadRecommendation {
   cubes: string[];
   checked: string;
   sources: Array<{ label: string; url: string }>;
-  classification: "Nikkers公開ビルド情報（静的確認）";
+  classification: "複数ソースで頻出" | "単一ソース参考";
 }
 
 type Priority = [effect: string, target: string, reason?: string];
 
 const nikkersSource = { label: "Nikkers API", url: "https://nikkers.cc/api" };
-const checked = "2026-11-03";
+const nikkeGgSource = { label: "NIKKE.GG Overload Gear Priority", url: "https://nikke.gg/overload-gear-priority/" };
+const checked = "2026-11-04";
 const recommendation = (resourceId: number, priorities: Priority[], cubes: string[] = [], extraSources: OverloadRecommendation["sources"] = []): OverloadRecommendation => ({
   resourceId,
-  priorities: priorities.map(([effect, target, reason]) => ({ effect, target, reason: reason ?? "Nikkersのキャラ別ビルド記載" })),
+  priorities: priorities.map(([effect, target, reason]) => ({ effect, target, reason: reason ?? "複数のキャラ別ビルドで頻出する目安" })),
   cubes,
   checked,
-  sources: [nikkersSource, ...extraSources],
-  classification: "Nikkers公開ビルド情報（静的確認）",
+  sources: [nikkersSource, nikkeGgSource, ...extraSources],
+  classification: "複数ソースで頻出",
 });
 
-// Nikkersの公開APIに記載されたキャラ別notesをresourceIdで対応付ける。
+// NikkersとNIKKE.GGのキャラ別記載を照合し、両方で頻出する効果と目安をresourceIdで対応付ける。
 // 名称の部分一致は「レッドフード」と「ラピ：レッドフード」を混同するため使用しない。
 const recommendations: OverloadRecommendation[] = [
   recommendation(19, [["有利コードダメージ増加", "4枠"], ["攻撃力増加", "4枠"], ["最大装弾数増加", "2枠"], ["クリティカルダメージ増加", "2枠"]], ["レリックレジリエンスキューブ", "レリックベアーキューブ"]),

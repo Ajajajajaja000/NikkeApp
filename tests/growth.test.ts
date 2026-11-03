@@ -33,13 +33,19 @@ describe("growth shortages", () => {
   it("resourceIdごとの公開推奨スキル値を不足判定に使う", () => {
     const recommendation = growthRecommendation(16);
     expect(recommendation?.skills).toEqual([10, 10, 10]);
+    expect(recommendation?.agreement).toBe("複数ソース一致");
     const shortages = growthShortages({ owned: true, favorite: true, imported: { skills: [7, 10, 10], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } }, recommendation?.skills);
     expect(shortages).toEqual(["スキル不足 3 / 0 / 0"]);
   });
 
+  it("頻出値と単一ソース参考を区別する", () => {
+    expect(growthRecommendation(191)).toMatchObject({ skills: [10, 4, 10], agreement: "複数ソース一致" });
+    expect(growthRecommendation(10)?.agreement).toBe("単一ソース参考");
+  });
+
   it("必須オバロ目標の未達を育成目標に含める", () => {
     const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
-    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test" }], cubes: [], checked: "2026-11-03", sources: [], classification: "Nikkers公開ビルド情報（静的確認）" });
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test" }], cubes: [], checked: "2026-11-03", sources: [], classification: "複数ソースで頻出" });
     expect(shortages).toContain("オバロ不足 1項目");
   });
 });
