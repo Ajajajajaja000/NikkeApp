@@ -15,9 +15,11 @@ export default function App() {
   const { data, setData, saveError } = useAppData();
   const [remoteCatalog, setRemoteCatalog] = useState<CharacterSummary[]>([]);
   const [catalogStatus, setCatalogStatus] = useState("APIへ接続しています…");
+  const [catalogLoading, setCatalogLoading] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const [connection, setConnectionState] = useState<BlablaConnection | null>(() => loadConnection());
   const [syncState, setSyncState] = useState("");
+  const [isSyncing, setIsSyncing] = useState(false);
   const syncing = useRef(false);
 
   const setConnection = useCallback((next: BlablaConnection | null) => {
@@ -28,6 +30,7 @@ export default function App() {
   const refresh = useCallback(() => setRefreshTick((value) => value + 1), []);
   useEffect(() => {
     const controller = new AbortController();
+    setCatalogLoading(true);
     setCatalogStatus("APIへ接続しています…");
     fetchCatalog(controller.signal).then((characters) => {
       setRemoteCatalog(characters);
@@ -37,7 +40,7 @@ export default function App() {
     }).catch((error) => {
       if (error instanceof DOMException && error.name === "AbortError") return;
       setCatalogStatus(`APIに接続できません。保存済み記録と内蔵最小データで継続します。${error instanceof Error ? `（${error.message}）` : ""}`);
-    });
+    }).finally(() => setCatalogLoading(false));
     return () => controller.abort();
   }, [refreshTick, setData]);
 
@@ -55,6 +58,7 @@ export default function App() {
       return false;
     }
     syncing.current = true;
+    setIsSyncing(true);
     const attemptedAt = new Date().toISOString();
     const active = baseConnection ?? createConnection(openid);
     setConnection({ ...active, openid, lastAttemptAt: attemptedAt });
@@ -78,10 +82,11 @@ export default function App() {
       setConnection({ ...active, openid, lastAttemptAt: attemptedAt, lastError: message });
       setSyncState(message);
       return false;
-    } finally { syncing.current = false; }
+    } finally { syncing.current = false; setIsSyncing(false); }
   }, [connection, remoteCatalog, setConnection, setData]);
 
   const connectBlabla = useCallback(async (link: string) => {
+    if (syncing.current) return;
     const openid = extractBlablaId(link);
     const next = createConnection(openid);
     setConnection(next);
@@ -101,7 +106,7 @@ export default function App() {
   const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} coreDust={data.profile.coreDust} lastBlablaImport={data.blablaMeta?.fetchedAt} onCoreDustChange={(coreDust) => setData((current) => ({ ...current, profile: { ...current.profile, coreDust } }))} goNikkes={() => setPage("nikkes")} />
     : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} savedTeams={data.profile.savedTeams} onSavedTeamsChange={(savedTeams) => setData((current) => ({ ...current, profile: { ...current.profile, savedTeams } }))} />
-    : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} connection={connection} syncState={syncState} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
+    : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
 
   return <div className="app-shell">
     <div className="top-accent" />

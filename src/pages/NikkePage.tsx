@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { CharacterDetail, CharacterSummary, NikkeRecord } from "../types";
 import { NikkeEditor } from "../components/NikkeEditor";
 import { emptyRecord, mergeRecord } from "../storage";
@@ -18,6 +18,7 @@ export function NikkePage({ catalog, records, onRecordChange }: Props) {
   const [limit, setLimit] = useState(40);
   const [details, setDetails] = useState<Record<string, CharacterDetail>>({});
   const [detailState, setDetailState] = useState<{ id: string; error?: string } | null>(null);
+  const detailRequests = useRef(new Set<string>());
 
   const options = (key: "element" | "corporation" | "weapon") => [...new Set(catalog.map((item) => item[key]).filter(Boolean))].sort();
   const filtered = useMemo(() => filterCharacters(catalog, records, {
@@ -32,7 +33,8 @@ export function NikkePage({ catalog, records, onRecordChange }: Props) {
   const toggleOpen = async (character: CharacterSummary) => {
     if (openId === character.id) { setOpenId(""); return; }
     setOpenId(character.id);
-    if (details[character.id] || character.source === "fallback") return;
+    if (details[character.id] || character.source === "fallback" || detailRequests.current.has(character.id)) return;
+    detailRequests.current.add(character.id);
     setDetailState({ id: character.id });
     try {
       const detail = await fetchCharacterDetail(character.id);
@@ -40,7 +42,7 @@ export function NikkePage({ catalog, records, onRecordChange }: Props) {
       setDetailState(null);
     } catch (error) {
       setDetailState({ id: character.id, error: error instanceof Error ? error.message : "詳細を取得できませんでした。" });
-    }
+    } finally { detailRequests.current.delete(character.id); }
   };
   const update = (character: CharacterSummary, patch: Partial<NikkeRecord>) => onRecordChange(character.id, mergeRecord(records[character.id], { ...patch, displayName: character.name }));
 
