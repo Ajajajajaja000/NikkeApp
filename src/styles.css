@@ -299,6 +299,9 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   .nikke-summary { grid-template-columns: 50px minmax(0, 1fr); gap: 9px; }
   .avatar { width: 50px; height: 50px; }
   .card-actions { grid-template-columns: minmax(124px, 1fr) minmax(76px, .6fr); grid-column: 2 / -1; min-width: 0; }
+  .filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .filters select { width: 100%; min-width: 0; }
+  .filters select:last-child { grid-column: 1 / -1; }
   .status-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .status-overview > span:last-child { grid-column: 1 / -1; }
   .equipment-grid { grid-template-columns: 1fr; }
