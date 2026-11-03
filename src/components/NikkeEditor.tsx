@@ -33,17 +33,21 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
     <NikkeStatusSummary record={value} overloadTargets={overloadTargets} />
 
     <h4>育成目標</h4>
-    <p className="muted">現在値はBlablaLink、目標値は確認済みのキャラ別公開推奨です。</p>
+    <p className="muted">現在値はBlablaLink、目標値は公開攻略で頻出する値を優先しています。複数ソースが一致しないキャラは参考値と明記します。</p>
     <div className="skill-target-table">
       <div className="skill-target-head"><span>スキル</span><span>現在値</span><span aria-hidden="true" /><span>推奨目標</span></div>
       {["スキル1", "スキル2", "バースト"].map((label, index) => <div className="skill-target-row" key={label}><strong>{label}</strong><output>{currentSkills[index]}</output><b aria-hidden="true">→</b><output className={growth && currentSkills[index] >= growth.skills[index] ? "target-met" : ""}>{growth?.skills[index] ?? "未確認"}</output></div>)}
     </div>
-    {growth && <p className="recommendation-meta">推奨スキル確認日 {growth.checked} · <a href={growth.sourceUrl} target="_blank" rel="noreferrer">取得元 ↗</a></p>}
+    {growth && <div className={`recommendation-meta ${growth.agreement === "複数ソース一致" ? "is-consensus" : "is-reference"}`}>
+      <strong>{growth.agreement}</strong><span>確認日 {growth.checked}</span>
+      {growth.note && <span>{growth.note}</span>}
+      <span className="recommendation-source-links">{growth.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</span>
+    </div>}
     <OverloadGoal record={value} recommendation={recommendation} onChange={(overloadGoals) => setTarget({ overloadGoals })} />
 
     <h4>オバロ推奨</h4>
     {recommendation ? <div className="recommendation">
-      <p>{recommendation.classification}（確認日 {recommendation.checked}）</p>
+      <p><strong>{recommendation.classification}</strong>（確認日 {recommendation.checked}）</p>
       <ul>{recommendation.priorities.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target} — {item.reason}</li>)}</ul>
       <p><strong>推奨キューブ：</strong>{recommendation.cubes.length > 0 ? recommendation.cubes.join(" / ") : "確認できる掲載なし"}</p>
       <div className="recommendation-sources">{recommendation.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div>

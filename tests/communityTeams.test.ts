@@ -28,6 +28,19 @@ describe("communityTeams", () => {
   it("クラーケン掲載編成を独自に組み替えていない", () => {
     const team = communityTeams.find((item) => item.id === "kraken-nayuta");
     expect(team?.members.map((member) => member.resourceId)).toEqual([513, 223, 262, 225, 330]);
+    expect(team?.substitutions.find((item) => item.memberIndex === 0)?.candidates.map((item) => item.resourceId)).toEqual([17, 281]);
+    expect(team?.substitutions.find((item) => item.memberIndex === 3)?.candidates.map((item) => item.resourceId)).toEqual([835, 284]);
+  });
+
+  it("代替候補を元の5枠へ対応付ける", () => {
+    for (const team of communityTeams) {
+      for (const substitution of team.substitutions) {
+        expect(substitution.memberIndex).toBeGreaterThanOrEqual(0);
+        expect(substitution.memberIndex).toBeLessThan(team.members.length);
+        expect(substitution.candidates.length).toBeGreaterThan(0);
+        expect(substitution.candidates.every((candidate) => candidate.name.length > 0)).toBe(true);
+      }
+    }
   });
 
   it("レッドフードとラピ：レッドフードを別キャラとして保持する", () => {

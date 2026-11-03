@@ -9,7 +9,7 @@ interface Props {
 }
 
 function resolveMember(member: CommunityTeamMember, catalog: CharacterSummary[]) {
-  return catalog.find((character) => character.resourceId === member.resourceId)
+  return (member.resourceId !== undefined ? catalog.find((character) => character.resourceId === member.resourceId) : undefined)
     ?? catalog.find((character) => character.name === member.name);
 }
 
@@ -59,7 +59,7 @@ export function TeamsPage({ catalog, records }: Props) {
             const record = character ? records[character.id] : undefined;
             const owned = Boolean(record?.owned);
             const treasure = Boolean(record?.imported?.collection?.treasure);
-            return <div className={`team-member ${owned ? "is-owned" : ""}`} key={member.resourceId}>
+            return <div className={`team-member ${owned ? "is-owned" : ""}`} key={`${member.resourceId ?? member.name}-${index}`}>
               <span className="position">{index + 1}</span>
               <div className="team-avatar">{character?.icon ? <img src={character.icon} alt="" loading="lazy" /> : member.name.slice(0, 1)}</div>
               <strong title={character?.name ?? member.name}>{character?.name ?? member.name}</strong>
@@ -77,8 +77,27 @@ export function TeamsPage({ catalog, records }: Props) {
           <ul>{entry.team.notes.map((note) => <li key={note}>{note}</li>)}</ul>
         </div>
         {entry.team.substitutions.length > 0 && <div className="team-substitutions">
-          <h3>掲載元にある代替例</h3>
-          <ul>{entry.team.substitutions.map((item) => <li key={item}>{item}</li>)}</ul>
+          <h3>掲載元の枠別代替候補</h3>
+          <p>矢印の左が入れ替え対象です。所持状況を見ながら、同じ行の候補へ置き換えられます。</p>
+          <div className="substitution-list">{entry.team.substitutions.map((substitution) => {
+            const original = entry.team.members[substitution.memberIndex];
+            return <div className="substitution-row" key={`${entry.team.id}-${substitution.memberIndex}`}>
+              <div className="substitution-original">
+                <small>{substitution.memberIndex + 1}枠目</small>
+                <strong>{original?.name ?? "対象枠"}</strong>
+              </div>
+              <span className="substitution-arrow" aria-label="の代替">→</span>
+              <div className="substitution-candidates">{substitution.candidates.map((candidate) => {
+                const character = resolveMember(candidate, catalog);
+                const owned = Boolean(character && records[character.id]?.owned);
+                return <span className={`substitute-chip ${owned ? "is-owned" : ""}`} key={`${candidate.resourceId ?? candidate.name}`}>
+                  <span>{character?.name ?? candidate.name}</span>
+                  <small>{owned ? "所持" : "未所持"}</small>
+                </span>;
+              })}</div>
+              {substitution.note && <p>{substitution.note}</p>}
+            </div>;
+          })}</div>
         </div>}
         <p className="verification-note"><strong>複数ソース照合：</strong>{entry.team.verification}</p>
         <div className="community-source">

@@ -132,8 +132,12 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .skill-target-row output { text-align: center; color: #f4f7fb; font: 800 1rem ui-monospace, monospace; }
 .skill-target-row output.target-met { color: var(--teal); }
 .skill-target-row b { text-align: center; color: var(--teal); }
-.recommendation-meta { margin: 7px 2px 0; color: var(--muted); font-size: .68rem; }
+.recommendation-meta { display: flex; gap: 6px 10px; flex-wrap: wrap; margin: 8px 2px 0; border-left: 3px solid #69778a; padding: 7px 9px; color: var(--muted); background: rgba(105,119,138,.06); font-size: .68rem; }
+.recommendation-meta.is-consensus { border-left-color: var(--teal); background: rgba(94,234,212,.055); }
+.recommendation-meta.is-consensus strong { color: var(--teal); }
+.recommendation-meta.is-reference strong { color: var(--amber); }
 .recommendation-meta a { color: var(--teal); }
+.recommendation-source-links { display: flex; gap: 8px; flex-wrap: wrap; flex-basis: 100%; }
 .status-summary { display: grid; gap: 10px; }
 .import-missing { border: 1px dashed #425069; border-radius: 11px; padding: 14px; color: var(--muted); background: #0b1018; font-size: .8rem; line-height: 1.65; }
 .status-overview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
@@ -248,8 +252,22 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .treasure-status.needed { color: #ffd08a; background: rgba(255,181,71,.1); }
 .order-note { border-left: 3px solid var(--violet); padding: 7px 10px; background: rgba(155,135,245,.07); font-size: .78rem !important; }
 .team-guidance, .team-substitutions { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 13px; }
-.team-guidance ul, .team-substitutions ul { margin: 7px 0 0; padding-left: 20px; color: #b8c4d4; font-size: .82rem; line-height: 1.65; }
+.team-guidance ul { margin: 7px 0 0; padding-left: 20px; color: #b8c4d4; font-size: .82rem; line-height: 1.65; }
 .team-substitutions h3 { color: var(--amber); }
+.team-substitutions > p { margin: 5px 0 10px; color: var(--muted); font-size: .74rem; }
+.substitution-list { display: grid; gap: 8px; }
+.substitution-row { display: grid; grid-template-columns: minmax(82px, .8fr) 24px minmax(0, 2fr); align-items: center; gap: 6px; border: 1px solid rgba(255,181,71,.18); border-radius: 11px; padding: 9px; background: rgba(255,181,71,.035); }
+.substitution-original { min-width: 0; }
+.substitution-original small { display: block; color: var(--muted); font-size: .62rem; }
+.substitution-original strong { display: block; overflow-wrap: anywhere; font-size: .76rem; }
+.substitution-arrow { color: var(--amber); text-align: center; font-weight: 900; }
+.substitution-candidates { display: flex; min-width: 0; gap: 6px; flex-wrap: wrap; }
+.substitute-chip { display: inline-flex; min-width: 0; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 7px; background: #0a1018; font-size: .7rem; }
+.substitute-chip > span { overflow-wrap: anywhere; }
+.substitute-chip small { flex: 0 0 auto; border-radius: 99px; padding: 2px 5px; color: #ffd08a; background: rgba(255,181,71,.1); font-size: .56rem; }
+.substitute-chip.is-owned { border-color: rgba(94,234,212,.35); }
+.substitute-chip.is-owned small { color: var(--teal); background: rgba(94,234,212,.1); }
+.substitution-row > p { grid-column: 3; margin: 0; color: var(--muted); font-size: .68rem; }
 .community-source { display: flex; justify-content: space-between; gap: 9px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 16px; padding-top: 13px; }
 .community-source span { color: var(--muted); font-size: .7rem; }
 .community-source a { font-size: .78rem; font-weight: 700; }
@@ -291,6 +309,11 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   .team-member strong { white-space: normal; }
   .ownership { margin: 5px 0 0; }
   .treasure-status { display: block; width: 100%; }
+}
+
+@media (max-width: 430px) {
+  .substitution-row { grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1.8fr); padding: 8px; }
+  .substitute-chip { width: 100%; justify-content: space-between; }
 }
 
 @media (max-width: 560px) {
