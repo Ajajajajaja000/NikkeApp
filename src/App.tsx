@@ -75,7 +75,7 @@ export default function App() {
       });
       const next = { ...active, openid, area: imported.area, lastAttemptAt: attemptedAt, lastSuccessAt: imported.fetchedAt, lastCount: matches.length, lastError: undefined };
       setConnection(next);
-      setSyncState(`${matches.length}体を取り込みました。手入力値は変更していません。`);
+      setSyncState(`${matches.length}体を取り込みました。取込値を最新状態へ更新しました。`);
       return true;
     } catch (error) {
       const message = blablaErrorMessage(error);
@@ -103,7 +103,7 @@ export default function App() {
   }, [connection, syncBlabla]);
 
   const updateRecord = (id: string, record: NikkeRecord) => setData((current) => ({ ...current, profile: { ...current.profile, records: { ...current.profile.records, [id]: record } } }));
-  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} coreDust={data.profile.coreDust} lastBlablaImport={data.blablaMeta?.fetchedAt} onCoreDustChange={(coreDust) => setData((current) => ({ ...current, profile: { ...current.profile, coreDust } }))} goNikkes={() => setPage("nikkes")} />
+  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} lastBlablaImport={data.blablaMeta?.fetchedAt} goNikkes={() => setPage("nikkes")} />
     : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} savedTeams={data.profile.savedTeams} onSavedTeamsChange={(savedTeams) => setData((current) => ({ ...current, profile: { ...current.profile, savedTeams } }))} />
     : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;

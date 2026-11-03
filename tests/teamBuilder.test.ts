@@ -22,15 +22,16 @@ describe("buildTeam", () => {
     expect(result.characterIds.slice(0, 4)).toEqual(["1", "2", "3", "4"]);
   });
 
-  it("未育成キャラより育成済みキャラを優先する", () => {
+  it("育成値を変えても所持編成の選出順位を変えない", () => {
     const catalog = [
       character("1", "リター", ["I"]), character("2", "クラウン", ["II"]),
-      character("3", "未育成の強キャラ", ["III"]), character("4", "育成済みA", ["III"]), character("5", "育成済みB", ["III"]),
+      character("3", "候補A", ["III"]), character("4", "候補B", ["III"]), character("5", "候補C", ["III"]),
     ];
     const records = { "1": owned(300), "2": owned(300), "3": owned(1, [1, 1, 1]), "4": owned(300, [10, 10, 10]), "5": owned(280, [9, 9, 9]) };
-    const result = buildTeam("campaign", catalog, records);
-    expect(result.characterIds.slice(2, 4)).toEqual(["4", "5"]);
-    expect(result.characterIds.indexOf("3")).toBeGreaterThan(result.characterIds.indexOf("5"));
+    const first = buildTeam("campaign", catalog, records);
+    const inverted = buildTeam("campaign", catalog, { ...records, "3": owned(400, [10, 10, 10]), "4": owned(1, [1, 1, 1]) });
+    expect(inverted.characterIds).toEqual(first.characterIds);
+    expect(first.reasons.some((item) => item.includes("育成") && item.includes("順位に使用していません"))).toBe(true);
   });
 
   it("レッドフードの再突入だけを継続B1として扱わない", () => {
@@ -42,5 +43,23 @@ describe("buildTeam", () => {
     const result = buildTeam("campaign", catalog, records);
     expect(result.mode).toBe("手動推奨");
     expect(result.cautions.some((item) => item.includes("再突入"))).toBe(true);
+  });
+
+  it("ラピ：レッドフードをレッドフードの再突入キャラと混同しない", () => {
+    const catalog = [
+      character("1", "リター", ["I"]), character("2", "クラウン", ["II"]),
+      character("201601", "ラピ：レッドフード", ["III"]), character("4", "A", ["III"]), character("5", "B", ["III"]),
+    ];
+    const records = Object.fromEntries(catalog.map((item) => [item.id, owned(300)]));
+    const result = buildTeam("campaign", catalog, records);
+    expect(result.cautions.some((item) => item.startsWith("レッドフードのⅠ・Ⅱ再突入"))).toBe(false);
+  });
+
+  it("所持編成とは別に全図鑑から参考目標編成を返す", () => {
+    const catalog = [character("1", "リター", ["I"]), character("2", "クラウン", ["II"]), character("3", "A", ["III"]), character("4", "B", ["III"]), character("5", "C", ["III"])];
+    const result = buildTeam("campaign", catalog, { "1": owned(300) });
+    expect(result.characterIds).toEqual(["1"]);
+    expect(result.referenceCharacterIds).toHaveLength(5);
+    expect(result.referenceCharacterIds).toContain("2");
   });
 });

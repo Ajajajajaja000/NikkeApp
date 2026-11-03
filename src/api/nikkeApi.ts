@@ -147,7 +147,7 @@ function parseGear(detail: JsonObject, equips: Map<number, MasterItem>, options:
       const state = effects.get(id);
       const functions = Array.isArray(state?.function_details) ? state.function_details.map(obj) : [];
       const value = firstNumber(functions[0]?.function_value);
-      return { id, name: option?.name ?? `効果ID ${id}`, rank: option?.rank, value: value === undefined ? undefined : value / 100, unit: value === undefined ? undefined : "%" };
+      return { id, name: option?.name ?? `効果ID ${id}`, rank: option?.rank, value: value === undefined ? undefined : Math.abs(value) / 100, unit: value === undefined ? undefined : "%" };
     });
     result[normalizeSlot(rawSlot)] = {
       id: tid,
@@ -225,6 +225,6 @@ export function parseRosterPayload(rosterRaw: unknown, equipsRaw: unknown, optio
 }
 
 export function mergeImportedRecord(current: NikkeRecord | undefined, snapshot: ImportedSnapshot): NikkeRecord {
-  // 手入力フィールドは一切上書きしない。UIでは手入力値を優先し、未入力時のみsnapshotを参照する。
+  // 旧版の手入力フィールドはバックアップ互換のため保持するが、画面表示では最新の取込値を正とする。
   return { ...(current ?? { owned: true, favorite: false }), owned: true, imported: snapshot };
 }
