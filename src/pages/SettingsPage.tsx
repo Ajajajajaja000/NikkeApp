@@ -9,8 +9,10 @@ interface Props {
   data: AppData;
   catalog: CharacterSummary[];
   catalogStatus: string;
+  catalogLoading: boolean;
   connection: BlablaConnection | null;
   syncState: string;
+  isSyncing: boolean;
   onConnect: (link: string) => Promise<void>;
   onSync: () => void;
   onConnectionChange: (value: BlablaConnection | null) => void;
@@ -18,7 +20,7 @@ interface Props {
   onRefresh: () => void;
 }
 
-export function SettingsPage({ data, catalog, catalogStatus, connection, syncState, onConnect, onSync, onConnectionChange, onDataChange, onRefresh }: Props) {
+export function SettingsPage({ data, catalog, catalogStatus, catalogLoading, connection, syncState, isSyncing, onConnect, onSync, onConnectionChange, onDataChange, onRefresh }: Props) {
   const [link, setLink] = useState("");
   const [importState, setImportState] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -55,15 +57,15 @@ export function SettingsPage({ data, catalog, catalogStatus, connection, syncSta
 
   return <section className="page">
     <div className="page-title"><p className="eyebrow">CONTROL</p><h1>設定</h1><p>更新・取り込み・バックアップ・出典</p></div>
-    <article className="panel"><div className="panel-head"><div><h2>マスターデータ</h2><p>{catalogStatus}</p></div><button className="secondary" onClick={onRefresh}>手動更新</button></div><div className="status-row"><span>現在 {catalog.length}体</span><span>取得元 {data.catalogMeta?.source ?? "内蔵最小データ"}</span><span>取得日時 {data.catalogMeta ? new Date(data.catalogMeta.fetchedAt).toLocaleString("ja-JP") : "未取得"}</span></div></article>
+    <article className="panel" aria-busy={catalogLoading}><div className="panel-head"><div><h2>マスターデータ</h2><p>{catalogStatus}</p></div><button className="secondary" onClick={onRefresh} disabled={catalogLoading}>{catalogLoading && <span className="spinner" aria-hidden="true" />}{catalogLoading ? "更新中…" : "手動更新"}</button></div><div className="status-row"><span>現在 {catalog.length}体</span><span>取得元 {data.catalogMeta?.source ?? "内蔵最小データ"}</span><span>取得日時 {data.catalogMeta ? new Date(data.catalogMeta.fetchedAt).toLocaleString("ja-JP") : "未取得"}</span></div></article>
 
-    <article className="panel"><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。手入力、育成目標、メモ、保存編成は上書きしません。</p>
+    <article className="panel" aria-busy={isSyncing}><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。手入力、育成目標、メモ、保存編成は上書きしません。</p>
       {connection ? <>
         <div className="status-row"><span>接続ID {maskedOpenid(connection.openid)}</span><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
         <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回の取り込み成功から3日経過していれば自動で取り込む</label>
-        <div className="button-row"><button className="primary" onClick={onSync}>今すぐ取り込む</button><button className="secondary" onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続IDを削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
+        <div className="button-row"><button className="primary" onClick={onSync} disabled={isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "今すぐ取り込む"}</button><button className="secondary" disabled={isSyncing} onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続IDを削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
         {connection.lastError && <p className="error-text">前回エラー: {connection.lastError}</p>}
-      </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="https://www.blablalink.com/user?openid=…" value={link} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim()}>接続して取り込む</button></div>}
+      </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="https://www.blablalink.com/user?openid=…" value={link} disabled={isSyncing} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim() || isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "接続して取り込む"}</button></div>}
       <details className="share-guide"><summary>公開BlablaLink共有URLの取得方法</summary><ol><li>NIKKE公式BlablaLinkへログインし、自分のプロフィールを開きます。</li><li>プロフィールの共有設定を公開にして「共有」からURLをコピーします。</li><li><code>https://www.blablalink.com/user?openid=…</code> の形のURLを上へ貼り付けます。</li></ol><p>ゲームのパスワード、Cookie、認証トークンは入力しないでください。</p></details>
       <p className="muted">接続中は公開URL内のopenidと選択サーバーだけをこの端末へ別保存します。JSONバックアップには含めません。バックグラウンド常駐や定期ポーリングは行いません。</p>{(syncState || importState) && <p className="notice" role="status">{importState || syncState}</p>}
     </article>

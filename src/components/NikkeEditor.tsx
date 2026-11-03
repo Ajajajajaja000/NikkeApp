@@ -84,7 +84,7 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
       <label>メモ<textarea rows={2} value={value.notes ?? ""} onChange={(e) => set({ notes: e.target.value })} /></label>
 
       <h4>API詳細（必要時だけ取得）</h4>
-      {detailLoading && <p className="muted">スキル情報を取得中…</p>}
+      {detailLoading && <p className="muted" role="status"><span className="spinner" aria-hidden="true" />スキル情報を取得中…</p>}
       {detailError && <p className="error-text">{detailError}</p>}
       {detail?.skills.map((skill) => <details className="skill-detail" key={skill.slot}><summary>{skill.name}{skill.cooldown ? ` / CT ${skill.cooldown}秒` : ""}</summary><p>{skill.description}</p></details>)}
     </div>
