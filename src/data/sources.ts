@@ -72,6 +72,12 @@ export const sources = [
     note: "2026-11-02更新。戦力差45〜50%帯のキャンペーン完成編成と運用説明を確認。アプリ側で欠員補完や独自編成は行わない。",
   },
   {
+    title: "平方ワールド — キャンペーン攻略ニケ",
+    url: "https://heihouworld.com/nikke-campaign-kyoukyara/",
+    checked: "2026-11-03",
+    note: "2026-07-12更新の個人攻略記事。執筆者自身が主観を含むと明記しているため完成編成の単独根拠にはせず、現環境と旧編成の区別、実戦上の役割説明を他ソースと照合する補助資料として使用。",
+  },
+  {
     title: "NIKKE.GG — Anomaly Interception Guides",
     url: "https://nikke.gg/anomaly-interception-kraken/",
     checked: "2026-11-03",

@@ -12,8 +12,17 @@ describe("communityTeams", () => {
         expect(team.source.url).toMatch(/^https:\/\//);
         expect(team.source.checked).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         expect(team.source.updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(team.verification.length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("最新のミラーコンテナとハーベスター編成を掲載形のまま保持する", () => {
+    expect(communityTeams.find((item) => item.id === "mirror-electric")?.members.map((member) => member.resourceId))
+      .toEqual([511, 17, 15, 330, 183]);
+    expect(communityTeams.find((item) => item.id === "harvester-balanced")?.members.map((member) => member.resourceId))
+      .toEqual([17, 330, 471, 234, 352]);
+    expect(communityTeams.filter((item) => item.purpose === "harvester")).toHaveLength(2);
   });
 
   it("クラーケン掲載編成を独自に組み替えていない", () => {
