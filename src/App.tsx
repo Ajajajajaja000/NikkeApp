@@ -49,7 +49,11 @@ export default function App() {
   }, [remoteCatalog, data.profile.records]);
 
   const syncBlabla = useCallback(async (openid = connection?.openid, baseConnection = connection) => {
-    if (!openid || syncing.current || remoteCatalog.length === 0) return;
+    if (!openid || syncing.current) return false;
+    if (remoteCatalog.length === 0) {
+      setSyncState("キャラ図鑑の取得が完了していないため取り込めません。通信状態を確認して、マスターデータを手動更新してください。");
+      return false;
+    }
     syncing.current = true;
     const attemptedAt = new Date().toISOString();
     const active = baseConnection ?? createConnection(openid);
@@ -68,10 +72,12 @@ export default function App() {
       const next = { ...active, openid, area: imported.area, lastAttemptAt: attemptedAt, lastSuccessAt: imported.fetchedAt, lastCount: matches.length, lastError: undefined };
       setConnection(next);
       setSyncState(`${matches.length}体を取り込みました。手入力値は変更していません。`);
+      return true;
     } catch (error) {
       const message = blablaErrorMessage(error);
       setConnection({ ...active, openid, lastAttemptAt: attemptedAt, lastError: message });
       setSyncState(message);
+      return false;
     } finally { syncing.current = false; }
   }, [connection, remoteCatalog, setConnection, setData]);
 
@@ -79,7 +85,9 @@ export default function App() {
     const openid = extractBlablaId(link);
     const next = createConnection(openid);
     setConnection(next);
-    await syncBlabla(openid, next);
+    const succeeded = await syncBlabla(openid, next);
+    // 初回に失敗した接続を「接続済み」と見せず、URL入力からやり直せる状態へ戻す。
+    if (!succeeded) setConnection(null);
   }, [setConnection, syncBlabla]);
 
   useEffect(() => {

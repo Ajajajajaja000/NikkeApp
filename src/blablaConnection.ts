@@ -10,7 +10,13 @@ export function createConnection(openid: string): BlablaConnection {
 export function loadConnection(): BlablaConnection | null {
   try {
     const value = JSON.parse(localStorage.getItem(BLABLA_CONNECTION_KEY) ?? "null") as Partial<BlablaConnection> | null;
-    return value?.version === 1 && typeof value.openid === "string" ? { ...value, autoSync: value.autoSync !== false, intervalHours: 72 } as BlablaConnection : null;
+    if (value?.version !== 1 || typeof value.openid !== "string") return null;
+    // 旧版で初回失敗後に残った接続情報も、次回起動時に入力画面へ戻す。
+    if (value.lastError && !value.lastSuccessAt) {
+      localStorage.removeItem(BLABLA_CONNECTION_KEY);
+      return null;
+    }
+    return { ...value, autoSync: value.autoSync !== false, intervalHours: 72 } as BlablaConnection;
   } catch { return null; }
 }
 

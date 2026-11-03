@@ -60,7 +60,7 @@ export function SettingsPage({ data, catalog, catalogStatus, connection, syncSta
     <article className="panel"><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。手入力、育成目標、メモ、保存編成は上書きしません。</p>
       {connection ? <>
         <div className="status-row"><span>接続ID {maskedOpenid(connection.openid)}</span><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
-        <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回成功から3日経過していれば自動確認する</label>
+        <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回の取り込み成功から3日経過していれば自動で取り込む</label>
         <div className="button-row"><button className="primary" onClick={onSync}>今すぐ取り込む</button><button className="secondary" onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続IDを削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
         {connection.lastError && <p className="error-text">前回エラー: {connection.lastError}</p>}
       </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="https://www.blablalink.com/user?openid=…" value={link} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim()}>接続して取り込む</button></div>}
