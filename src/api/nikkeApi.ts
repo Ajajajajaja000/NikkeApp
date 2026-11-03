@@ -17,6 +17,8 @@ function text(value: unknown): string {
 function parseBursts(value: unknown): BurstStage[] {
   const source = Array.isArray(value) ? value : [value];
   const joined = source.map(String).join(" ").toUpperCase();
+  // APIの `All` はレッドフード等の段階可変バーストを表す。
+  if (/\bALL\b/.test(joined)) return ["I", "II", "III"];
   const result: BurstStage[] = [];
   if (/(^|[^I])I([^I]|$)|BURST\s*1|Ⅰ/.test(joined)) result.push("I");
   if (/II([^I]|$)|BURST\s*2|Ⅱ/.test(joined)) result.push("II");

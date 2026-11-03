@@ -9,6 +9,11 @@ describe("character identity and import", () => {
     expect(redHood.name).not.toBe(rapi.name);
   });
 
+  it("APIのAllバーストをI・II・IIIとして扱う", () => {
+    const redHood = normalizeCharacter({ id: 447001, name: "レッドフード", burst: "All", weapon: { type: "SR" } });
+    expect(redHood.bursts).toEqual(["I", "II", "III"]);
+  });
+
   it("取り込み時に手入力を上書きしない", () => {
     const merged = mergeImportedRecord({ owned: true, favorite: true, level: 320, skills: [10, 9, 10], notes: "手入力" }, { level: 300, combatPower: 123456, fetchedAt: "2026-11-03T00:00:00Z", source: "test" });
     expect(merged.level).toBe(320);
