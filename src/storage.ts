@@ -1,4 +1,5 @@
 import type { AppData, CoreDustState, GearRecord, GearSlot, LocalProfile, NikkeRecord } from "./types";
+import { parseOverloadTarget } from "./rules/overload";
 
 export const STORAGE_KEY = "nikke-compass:data";
 
@@ -22,10 +23,10 @@ export const emptyRecord = (): NikkeRecord => ({
   favorite: false,
 });
 
-const profile = (): LocalProfile => ({ id: "local", name: "この端末", records: {}, savedTeams: [], coreDust: defaultCoreDust() });
+const profile = (): LocalProfile => ({ id: "local", name: "この端末", records: {}, coreDust: defaultCoreDust() });
 
 export const createDefaultData = (): AppData => ({
-  version: 3,
+  version: 4,
   profile: profile(),
 });
 
@@ -34,25 +35,32 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function validateImport(value: unknown): AppData {
-  if (!isObject(value) || (value.version !== 2 && value.version !== 3) || !isObject(value.profile)) {
-    throw new Error("対応していないバックアップ形式です（データバージョン2または3が必要です）。");
+  if (!isObject(value) || (value.version !== 2 && value.version !== 3 && value.version !== 4) || !isObject(value.profile)) {
+    throw new Error("対応していないバックアップ形式です（データバージョン2〜4が必要です）。");
   }
   const item = value.profile;
   if (typeof item.id !== "string" || typeof item.name !== "string" || !isObject(item.records)) {
     throw new Error("端末データが壊れています。");
   }
-  if (value.version === 2) {
+  if (value.version === 2 || value.version === 3) {
     const migrated = structuredClone(value) as Record<string, unknown>;
-    migrated.version = 3;
+    migrated.version = 4;
     const migratedProfile = migrated.profile as Record<string, unknown>;
+    delete migratedProfile.savedTeams;
     const records = migratedProfile.records as Record<string, Record<string, unknown>>;
     for (const record of Object.values(records)) {
       // v2では所持切替だけでも初期値が「手入力」として保存された。編集日時がない初期値だけを除き、v3の取込値を表示できるようにする。
-      if (record.manualUpdatedAt) continue;
-      if (JSON.stringify(record.skills) === "[1,1,1]") delete record.skills;
-      if (JSON.stringify(record.cube) === JSON.stringify({ name: "なし", level: 0 })) delete record.cube;
-      if (JSON.stringify(record.collection) === JSON.stringify({ rarity: "なし", level: 0, treasure: false })) delete record.collection;
-      if (record.gear && JSON.stringify(record.gear) === JSON.stringify(defaultGear())) delete record.gear;
+      if (value.version === 2 && !record.manualUpdatedAt) {
+        if (JSON.stringify(record.skills) === "[1,1,1]") delete record.skills;
+        if (JSON.stringify(record.cube) === JSON.stringify({ name: "なし", level: 0 })) delete record.cube;
+        if (JSON.stringify(record.collection) === JSON.stringify({ rarity: "なし", level: 0, treasure: false })) delete record.collection;
+        if (record.gear && JSON.stringify(record.gear) === JSON.stringify(defaultGear())) delete record.gear;
+      }
+      const target = record.target as Record<string, unknown> | undefined;
+      if (target && Array.isArray(target.overloadGoals)) target.overloadGoals = target.overloadGoals.map((goal) => {
+        const old = goal as { effect?: unknown; target?: unknown };
+        return typeof old.effect === "string" && typeof old.target === "string" ? parseOverloadTarget(old.effect, old.target) : goal;
+      });
     }
     return migrated as unknown as AppData;
   }

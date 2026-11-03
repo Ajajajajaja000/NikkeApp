@@ -68,7 +68,12 @@ export interface ImportedSnapshot {
 
 export interface OverloadTarget {
   effect: string;
-  target: string;
+  condition:
+    | { type: "lines"; minimum: number; recommended?: number }
+    | { type: "percent"; minimum: number }
+    | { type: "present" }
+    | { type: "absent" };
+  priority: "required" | "optional";
 }
 
 export interface NikkeRecord {
@@ -96,16 +101,6 @@ export interface NikkeRecord {
   imported?: ImportedSnapshot;
 }
 
-export interface SavedTeam {
-  id: string;
-  name: string;
-  purpose: string;
-  characterIds: string[];
-  createdAt: string;
-  sourceUrl?: string;
-  sourceChecked?: string;
-}
-
 export interface CoreDustState {
   currentLevel: number;
   targetLevel: number;
@@ -118,12 +113,11 @@ export interface LocalProfile {
   id: string;
   name: string;
   records: Record<string, NikkeRecord>;
-  savedTeams: SavedTeam[];
   coreDust: CoreDustState;
 }
 
 export interface AppData {
-  version: 3;
+  version: 4;
   profile: LocalProfile;
   catalogMeta?: { fetchedAt: string; source: string; count: number };
   blablaMeta?: { fetchedAt: string; source: string; count: number };

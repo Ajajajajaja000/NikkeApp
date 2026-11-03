@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CharacterDetail, CharacterSummary, NikkeRecord } from "../types";
 import { NikkeEditor } from "../components/NikkeEditor";
 import { emptyRecord, mergeRecord } from "../storage";
@@ -30,6 +30,7 @@ export function NikkePage({ catalog, records, filters, initialOpenId, onFiltersC
   const [details, setDetails] = useState<Record<string, CharacterDetail>>({});
   const [detailState, setDetailState] = useState<{ id: string; error?: string } | null>(null);
   const detailRequests = useRef(new Set<string>());
+  const scrollAnchor = useRef<{ id: string; top: number } | null>(null);
 
   const options = (key: "element" | "corporation" | "weapon") => [...new Set(catalog.map((item) => item[key]).filter(Boolean))].sort();
   const filtered = useMemo(() => filterCharacters(catalog, records, {
@@ -51,10 +52,19 @@ export function NikkePage({ catalog, records, filters, initialOpenId, onFiltersC
     } finally { detailRequests.current.delete(character.id); }
   };
   const toggleOpen = async (character: CharacterSummary) => {
+    const element = document.getElementById(`nikke-${character.id}`);
+    if (element) scrollAnchor.current = { id: character.id, top: element.getBoundingClientRect().top };
     if (openId === character.id) { setOpenId(""); return; }
     setOpenId(character.id);
     await loadDetail(character);
   };
+  useLayoutEffect(() => {
+    const anchor = scrollAnchor.current;
+    if (!anchor) return;
+    const element = document.getElementById(`nikke-${anchor.id}`);
+    if (element) window.scrollBy({ top: element.getBoundingClientRect().top - anchor.top, behavior: "auto" });
+    scrollAnchor.current = null;
+  }, [openId]);
   useEffect(() => {
     if (!focusedCharacter) return;
     setOpenId(focusedCharacter.id);
