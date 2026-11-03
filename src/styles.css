@@ -123,13 +123,14 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 
 .editor { border-top: 1px solid var(--line); padding: 16px; background: #111824; }
 .source-note, .notice { border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 9px 11px; color: #bceee6; background: rgba(94,234,212,.07); font-size: .76rem; }
-.skill-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.skill-row label { border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
-.skill-row label > span { display: flex; align-items: center; gap: 4px; }
-.skill-row input { min-width: 0; padding: 5px; text-align: center; }
-.skill-row output { flex: 1; text-align: center; color: #f4f7fb; font-weight: 800; }
-.skill-row b { color: var(--muted); }
-.target-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 12px; }
+.skill-target-table { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #0b1018; }
+.skill-target-head, .skill-target-row { display: grid; grid-template-columns: minmax(70px, 1fr) minmax(56px, .7fr) 24px minmax(82px, .8fr); gap: 8px; align-items: center; }
+.skill-target-head { padding: 8px 11px; color: var(--muted); background: #151d29; font-size: .68rem; }
+.skill-target-row { min-height: 58px; padding: 7px 11px; border-top: 1px solid rgba(255,255,255,.06); }
+.skill-target-row strong { font-size: .78rem; }
+.skill-target-row output { text-align: center; color: #f4f7fb; font: 800 1rem ui-monospace, monospace; }
+.skill-target-row b { text-align: center; color: var(--teal); }
+.skill-target-row input { min-width: 0; min-height: 44px; padding: 7px; text-align: center; font-weight: 800; }
 .status-summary { display: grid; gap: 10px; }
 .import-missing { border: 1px dashed #425069; border-radius: 11px; padding: 14px; color: var(--muted); background: #0b1018; font-size: .8rem; line-height: 1.65; }
 .status-overview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
@@ -143,12 +144,20 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .equipment-head { display: flex; align-items: center; gap: 6px; }
 .equipment-head > span { margin-left: auto; color: #dce5f1; font: 700 .72rem ui-monospace, monospace; }
 .equipment-head b { border-radius: 5px; padding: 3px 5px; color: #ece8ff; background: rgba(155,135,245,.25); font-size: .65rem; }
-.equipment-card p { margin: 8px 0 2px; color: #dbe3ee; font-size: .75rem; line-height: 1.35; }
-.equipment-card > small { color: var(--muted); font-size: .65rem; }
+.equipment-card > small { display: block; margin-top: 7px; color: var(--muted); font-size: .65rem; }
 .overload-options { display: grid; gap: 5px; margin: 9px 0 0; padding: 0; list-style: none; }
-.overload-options li { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid rgba(255,255,255,.06); padding-top: 5px; font-size: .68rem; }
+.overload-options li { display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,.07); border-radius: 7px; padding: 7px; font-size: .68rem; }
+.overload-options li > div { min-width: 0; display: flex; align-items: center; gap: 5px; }
 .overload-options li span { min-width: 0; color: #d9d3ff; overflow-wrap: anywhere; }
-.overload-options li strong { flex: 0 0 auto; color: #fff; }
+.overload-options li b { flex: 0 0 auto; border-radius: 4px; padding: 2px 4px; font-size: .58rem; }
+.overload-options li > strong { flex: 0 0 auto; display: grid; justify-items: end; color: #fff; }
+.overload-options li > strong small { color: var(--muted); font-size: .58rem; }
+.overload-options .roll-blue { border-color: rgba(65,165,255,.55); background: rgba(48,143,255,.1); }
+.overload-options .roll-blue span, .overload-options .roll-blue > strong { color: #65baff; }
+.overload-options .roll-blue b { color: #061625; background: #65baff; }
+.overload-options .roll-black { border-color: #e9edf4; background: linear-gradient(90deg, #020304, #0b0d11); box-shadow: inset 4px 0 #000; }
+.overload-options .roll-black span, .overload-options .roll-black > strong { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,.35); }
+.overload-options .roll-black b { color: #050607; background: #fff; }
 .equipment-card .no-options { color: #68768a; font-size: .66rem; }
 .gear-list { display: grid; gap: 7px; }
 .gear-row { display: grid; grid-template-columns: 30px minmax(90px, 1.4fr) minmax(54px, .7fr) 64px; align-items: center; gap: 7px; }
@@ -160,6 +169,32 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .recommendation p, .recommendation li, .recommendation a { font-size: .78rem; line-height: 1.55; }
 .recommendation ul { padding-left: 20px; }
 .recommendation-sources { display: flex; gap: 10px; flex-wrap: wrap; }
+.overload-goal { margin-top: 18px; border: 1px solid rgba(155,135,245,.4); border-radius: 14px; padding: 13px; background: linear-gradient(135deg, rgba(155,135,245,.08), transparent 45%), #0b1018; }
+.overload-goal h4 { margin-top: 0; }
+.overload-goal-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.overload-goal-stats span { min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 8px; background: rgba(7,10,15,.72); }
+.overload-goal-stats small, .overload-goal-stats strong { display: block; }
+.overload-goal-stats small { color: var(--muted); font-size: .62rem; }
+.overload-goal-stats strong { margin-top: 3px; overflow-wrap: anywhere; font-size: .78rem; }
+.overload-goal-stats .blue-stat strong { color: #65baff; }
+.overload-goal-stats .black-stat { border-color: #dce2ea; background: #030405; }
+.next-overload-action { margin: 11px 0; border-left: 3px solid var(--amber); padding: 8px 10px; color: #f5d59d !important; background: rgba(255,181,71,.07); font-size: .8rem !important; }
+.overload-goal-list { display: grid; gap: 6px; }
+.overload-goal-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 9px; padding: 9px; }
+.overload-goal-row > div { min-width: 0; }
+.overload-goal-row strong, .overload-goal-row small { display: block; overflow-wrap: anywhere; }
+.overload-goal-row small { margin-top: 2px; color: var(--muted); font-size: .62rem; }
+.overload-goal-row > span { font-size: .7rem; font-weight: 700; }
+.overload-goal-row.met { border-color: rgba(94,234,212,.3); }
+.overload-goal-row.met > span { color: var(--teal); }
+.overload-goal-row.missing { border-color: rgba(255,181,71,.32); }
+.overload-goal-row.missing > span { color: #ffd08a; }
+.overload-goal-row.optional { opacity: .8; }
+.roll-legend { display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0 0; font-size: .65rem !important; }
+.roll-legend span { border-radius: 5px; padding: 4px 6px; }
+.blue-sample { color: #65baff; background: rgba(48,143,255,.1); }
+.black-sample { color: white; border: 1px solid #dce2ea; background: #030405; }
+.cube-target { max-width: 260px; margin-top: 14px; }
 .check { display: flex; grid-auto-flow: column; justify-content: start; align-items: center; gap: 6px; min-height: 44px; }
 .check input { width: 22px; min-height: 22px; height: 22px; accent-color: var(--teal); }
 .check.wide { margin-top: 8px; }
@@ -234,7 +269,7 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   main { padding-left: 12px; padding-right: 12px; }
   .hero { min-height: 190px; padding: 20px; }
   .hero-stat { min-width: 72px; }
-  .form-grid.two, .analysis-grid, .sources, .target-grid { grid-template-columns: 1fr; }
+  .form-grid.two, .analysis-grid, .sources { grid-template-columns: 1fr; }
   .case-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .case-grid input { padding: 7px 3px; text-align: center; }
   .result-grid strong { font-size: .86rem; }
@@ -244,6 +279,7 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
   .status-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .status-overview > span:last-child { grid-column: 1 / -1; }
   .equipment-grid { grid-template-columns: 1fr; }
+  .overload-goal-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .team-line { gap: 4px; }
   .team-member { padding: 5px; }
   .team-member strong { font-size: .63rem; }

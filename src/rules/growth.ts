@@ -56,15 +56,7 @@ export function growthShortages(record: NikkeRecord): string[] {
   const skills = effectiveSkills(record);
   const skillGap = target.skills.map((value, index) => Math.max(0, value - skills[index]));
   if (skillGap.some(Boolean)) shortages.push(`スキル不足 ${skillGap.join(" / ")}`);
-  const slots: GearSlot[] = ["head", "chest", "arms", "legs"];
-  const gear = slots.map((slot) => effectiveGear(record, slot));
-  const overload = gear.filter((item) => item.overload).length;
-  if (overload < target.overloadCount) shortages.push(`オバロ あと${target.overloadCount - overload}部位`);
   const cubeLevel = effectiveCube(record).level;
   if (cubeLevel < target.cubeLevel) shortages.push(`キューブ あと${target.cubeLevel - cubeLevel}Lv`);
-  const tierOrder = ["未設定", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T9企業", "OL"];
-  const targetIndex = tierOrder.indexOf(target.gearTier);
-  const underGear = gear.filter((item) => tierOrder.indexOf(item.tier) < targetIndex).length;
-  if (underGear) shortages.push(`${target.gearTier}未満 ${underGear}部位`);
   return shortages;
 }

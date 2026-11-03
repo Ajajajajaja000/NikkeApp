@@ -1,4 +1,4 @@
-const CACHE_VERSION = "nikke-compass-v7";
+const CACHE_VERSION = "nikke-compass-v8";
 const APP_SHELL = [
   "./",
   "./index.html",

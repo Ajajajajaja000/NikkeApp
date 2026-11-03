@@ -1,5 +1,6 @@
 import type { GearSlot, NikkeRecord } from "../types";
 import { effectiveCollection, effectiveCube, effectiveGear, effectiveLevel, effectiveLimitBreak, effectiveSkills } from "../rules/growth";
+import { overloadRollStyle } from "../rules/overload";
 
 const slots: Array<{ id: GearSlot; label: string }> = [
   { id: "head", label: "頭" },
@@ -33,11 +34,14 @@ export function NikkeStatusSummary({ record }: { record: NikkeRecord }) {
         const gear = effectiveGear(record, slot.id);
         return <section className={`equipment-card ${gear.overload ? "overloaded" : ""}`} key={slot.id}>
           <div className="equipment-head"><strong>{slot.label}</strong><span>{gear.tier} · Lv.{gear.level}</span>{gear.overload && <b>OL</b>}</div>
-          <p>{gear.name || "装備情報なし"}</p>
-          <small>{gear.corporation || "企業不明"}{gear.id ? ` · ID ${gear.id}` : ""}</small>
-          {gear.options?.length ? <ul className="overload-options">{gear.options.map((option, index) => <li key={`${option.id ?? option.name}-${index}`}>
-            <span>{option.name}</span><strong>ランク{option.rank ?? "?"}{option.value !== undefined ? ` · ${option.value}${option.unit ?? ""}` : ""}</strong>
-          </li>)}</ul> : <p className="no-options">オバロ効果なし</p>}
+          <small>企業：{gear.corporation || "不明"}</small>
+          {gear.options?.length ? <ul className="overload-options">{gear.options.map((option, index) => {
+            const style = overloadRollStyle(option.rank);
+            return <li className={`roll-${style}`} key={`${option.id ?? option.name}-${index}`}>
+              <div><span>{option.name}</span>{style === "blue" && <b>青字</b>}{style === "black" && <b>黒帯</b>}</div>
+              <strong>{option.value !== undefined ? `${option.value}${option.unit ?? ""}` : "数値不明"}<small>ランク{option.rank ?? "?"}</small></strong>
+            </li>;
+          })}</ul> : <p className="no-options">オバロ効果なし</p>}
         </section>;
       })}
     </div>
