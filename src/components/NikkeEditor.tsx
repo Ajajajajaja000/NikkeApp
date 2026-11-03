@@ -47,7 +47,6 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
       <p>{recommendation.classification}（確認日 {recommendation.checked}）</p>
       <ul>{recommendation.priorities.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target} — {item.reason}</li>)}</ul>
       {recommendation.cubes.length > 0 && <p>キューブ候補: {recommendation.cubes.join(" / ")}</p>}
-      <p className="muted">公開APIのキャラ別記載を、新キャラ追加・既存ビルド変更時に確認する静的情報です。Nikkers APIはブラウザから直接取得しません。</p>
       <div className="recommendation-sources">{recommendation.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div>
     </div> : <p className="muted">このキャラは公開ビルド情報とのresourceId照合ができていません。推測値は表示しません。</p>}
 
