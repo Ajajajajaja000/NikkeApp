@@ -47,7 +47,7 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
       <ul>{recommendation.priorities.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target} — {item.reason}</li>)}</ul>
       <p><strong>推奨キューブ：</strong>{recommendation.cubes.length > 0 ? recommendation.cubes.join(" / ") : "確認できる掲載なし"}</p>
       <div className="recommendation-sources">{recommendation.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div>
-    </div> : <p className="muted">このキャラは公開ビルド情報とのresourceId照合ができていません。推測値は表示しません。</p>}
+    </div> : <p className="muted">このキャラは公開ビルド情報との照合ができていません。推測値は表示しません。</p>}
 
     <label>メモ<textarea rows={2} value={value.notes ?? ""} onChange={(e) => set({ notes: e.target.value })} /></label>
 

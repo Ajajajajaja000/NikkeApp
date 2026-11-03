@@ -147,11 +147,11 @@ function parseGear(detail: JsonObject, equips: Map<number, MasterItem>, options:
       const state = effects.get(id);
       const functions = Array.isArray(state?.function_details) ? state.function_details.map(obj) : [];
       const value = firstNumber(functions[0]?.function_value);
-      return { id, name: option?.name ?? `効果ID ${id}`, rank: option?.rank, value: value === undefined ? undefined : Math.abs(value) / 100, unit: value === undefined ? undefined : "%" };
+      return { id, name: option?.name ?? "効果名未取得", rank: option?.rank, value: value === undefined ? undefined : Math.abs(value) / 100, unit: value === undefined ? undefined : "%" };
     });
     result[normalizeSlot(rawSlot)] = {
       id: tid,
-      name: master?.name ?? `装備ID ${tid}`,
+      name: master?.name ?? "装備情報未取得",
       corporation: master?.corporation,
       tier: parsedOptions.length ? "OL" : (master?.rare ?? "未設定"),
       level: firstNumber(detail[`${rawSlot}_equip_lv`], detail[`${rawSlot}_equip_level`]) ?? 0,
@@ -168,7 +168,7 @@ function parseCollection(detail: JsonObject, favorites: Map<number, MasterItem>)
   const master = favorites.get(id);
   const rawRare = master?.rare;
   const rarity = rawRare === "R" || rawRare === "SR" || rawRare === "SSR" ? rawRare : "なし";
-  return { id, name: master?.name ?? `コレクションID ${id}`, rarity, level: firstNumber(detail.favorite_item_lv, detail.favorite_lv, detail.collection_item_lv, detail.collection_lv) ?? 0, treasure: rarity === "SSR" || Boolean(detail.favorite_item_is_treasure ?? detail.is_favorite_item) };
+  return { id, name: master?.name ?? "コレクション情報未取得", rarity, level: firstNumber(detail.favorite_item_lv, detail.favorite_lv, detail.collection_item_lv, detail.collection_lv) ?? 0, treasure: rarity === "SSR" || Boolean(detail.favorite_item_is_treasure ?? detail.is_favorite_item) };
 }
 
 function listMap(json: unknown, key: string): Map<number, MasterItem> {
@@ -216,7 +216,7 @@ export function parseRosterPayload(rosterRaw: unknown, equipsRaw: unknown, optio
       combatPower: firstNumber(item.combat, item.combat_power),
       skills: [firstNumber(detail.skill1_lv) ?? 1, firstNumber(detail.skill2_lv) ?? 1, firstNumber(detail.ulti_skill_lv, detail.burst_lv) ?? 1],
       gear: parseGear(detail, equips, options, effects),
-      cube: cubeId ? { id: cubeId, name: cubeMaster?.name ?? `キューブID ${cubeId}`, level: firstNumber(detail.cube_lv, detail.cube_level, detail.harmony_cube_lv) ?? 0 } : undefined,
+      cube: cubeId ? { id: cubeId, name: cubeMaster?.name ?? "キューブ情報未取得", level: firstNumber(detail.cube_lv, detail.cube_level, detail.harmony_cube_lv) ?? 0 } : undefined,
       collection: parseCollection(detail, favorites), fetchedAt, source: "BlablaLink公開プロフィール / 非公式NIKKE API roster",
     } };
   }).filter((row): row is ImportedRosterRow => row !== null);

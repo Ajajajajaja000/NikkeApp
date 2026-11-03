@@ -4,6 +4,7 @@ import { NikkeStatusSummary } from "../components/NikkeStatusSummary";
 import { growthRecommendation } from "../data/growthRecommendations";
 import { overloadRecommendation } from "../data/overloadRecommendations";
 import { effectiveOverloadTargets } from "../rules/overload";
+import { burstLabel, elementLabel } from "../presentation/labels";
 
 interface Props {
   catalog: CharacterSummary[];
@@ -34,7 +35,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
         const overloadTargets = effectiveOverloadTargets(record, overload);
         return <article className="growth-card" key={character.id}>
           <div className="rank">{String(index + 1).padStart(2, "0")}</div>
-          <div><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {character.element} · B{character.bursts.join("/") || "?"}</p></div>
+          <div><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {elementLabel(character.element)} · {burstLabel(character.bursts)}</p></div>
           <div className="shortage-list">{shortages.length ? shortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}</div>
           <button className="secondary growth-open-button" onClick={() => goNikkes(character.id)}>ニケ一覧で詳細を見る</button>
           <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} overloadTargets={overloadTargets} /></details>

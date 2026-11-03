@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import type { AppData, BlablaConnection, CharacterSummary } from "../types";
 import { createDefaultData, validateImport } from "../storage";
 import { sources } from "../data/sources";
-import { maskedOpenid } from "../blablaConnection";
 import { blablaErrorMessage } from "../api/nikkeApi";
 
 interface Props {
@@ -61,13 +60,13 @@ export function SettingsPage({ data, catalog, catalogStatus, catalogLoading, con
 
     <article className="panel" aria-busy={isSyncing}><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。キャラのマスターデータが未取得なら先に自動取得して、そのまま詳細取り込みへ進みます。手動のオバロ目標とメモは上書きしません。</p>
       {connection ? <>
-        <div className="status-row"><span>接続ID {maskedOpenid(connection.openid)}</span><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
+        <div className="status-row"><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
         <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回の取り込み成功から1週間経過していれば自動で取り込む</label>
-        <div className="button-row"><button className="primary" onClick={onSync} disabled={isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "今すぐ取り込む"}</button><button className="secondary" disabled={isSyncing} onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続IDを削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
+        <div className="button-row"><button className="primary" onClick={onSync} disabled={isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "今すぐ取り込む"}</button><button className="secondary" disabled={isSyncing} onClick={() => { if (window.confirm("この端末に保存したBlablaLink接続情報を削除しますか？取り込み済みの育成データは残ります。")) onConnectionChange(null); }}>接続を解除</button></div>
         {connection.lastError && <p className="error-text">前回エラー: {connection.lastError}</p>}
-      </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="https://www.blablalink.com/user?openid=…" value={link} disabled={isSyncing} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim() || isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "接続して取り込む"}</button></div>}
-      <details className="share-guide"><summary>公開BlablaLink共有URLの取得方法</summary><ol><li>NIKKE公式BlablaLinkへログインし、自分のプロフィールを開きます。</li><li>プロフィールの共有設定を公開にして「共有」からURLをコピーします。</li><li><code>https://www.blablalink.com/user?openid=…</code> の形のURLを上へ貼り付けます。</li></ol><p>ゲームのパスワード、Cookie、認証トークンは入力しないでください。</p></details>
-      <p className="muted">接続中は公開URL内のopenidと選択サーバーだけをこの端末へ別保存します。JSONバックアップには含めません。バックグラウンド常駐や定期ポーリングは行いません。</p>{(syncState || importState) && <p className="notice" role="status">{importState || syncState}</p>}
+      </> : <div className="action-row"><input type="url" aria-label="BlablaLink共有URL" placeholder="BlablaLinkの共有URLを貼り付け" value={link} disabled={isSyncing} onChange={(e) => setLink(e.target.value)} /><button className="primary" onClick={connect} disabled={!link.trim() || isSyncing}>{isSyncing && <span className="spinner dark" aria-hidden="true" />}{isSyncing ? "取り込み中…" : "接続して取り込む"}</button></div>}
+      <details className="share-guide"><summary>公開BlablaLink共有URLの取得方法</summary><ol><li>NIKKE公式BlablaLinkへログインし、自分のプロフィールを開きます。</li><li>プロフィールの共有設定を公開にして「共有」からURLをコピーします。</li><li>コピーした共有URLをそのまま上へ貼り付けます。</li></ol><p>ゲームのパスワード、Cookie、認証トークンは入力しないでください。</p></details>
+      <p className="muted">接続中は共有URLから読み取った接続情報と選択サーバーだけをこの端末へ別保存します。JSONバックアップには含めません。バックグラウンド常駐や定期ポーリングは行いません。</p>{(syncState || importState) && <p className="notice" role="status">{importState || syncState}</p>}
     </article>
 
     <article className="panel"><h2>バックアップ</h2><p>Safariのサイトデータ削除や別端末への移行に備えて、定期的にJSONを書き出してください。画像・API詳細キャッシュは含みません。</p><div className="button-row"><button className="primary" onClick={exportData}>JSONを書き出す</button><button className="secondary" onClick={() => fileRef.current?.click()}>JSONから復元</button><input ref={fileRef} className="visually-hidden" type="file" accept="application/json,.json" onChange={(e) => importFile(e.target.files?.[0])} /></div><p className="muted">夫婦それぞれの端末で独立保存されます。自動同期・アカウント機能はありません。</p></article>
