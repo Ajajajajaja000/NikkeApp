@@ -178,6 +178,17 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .recommendation p, .recommendation li, .recommendation a { font-size: .78rem; line-height: 1.55; }
 .recommendation ul { padding-left: 20px; }
 .recommendation-sources { display: flex; gap: 10px; flex-wrap: wrap; }
+.overload-recommendation-head { display: flex; gap: 5px 10px; flex-wrap: wrap; align-items: center; }
+.overload-recommendation-head strong { flex-basis: 100%; color: var(--teal); }
+.overload-recommendation-head span { border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; color: var(--muted); font-size: .65rem; }
+.overload-recommendation-group { margin-top: 10px; border-left: 3px solid var(--teal); border-radius: 7px; padding: 8px 10px; background: rgba(94,234,212,.045); }
+.overload-recommendation-group h5 { margin: 0 0 5px; font-size: .76rem; }
+.overload-recommendation-group ul { margin: 0; }
+.overload-recommendation-group p { margin: 0 0 5px; color: var(--muted); }
+.overload-recommendation-group.filler { border-left-color: #69778a; background: rgba(105,119,138,.055); }
+.overload-recommendation-group.avoid { border-left-color: var(--amber); background: rgba(255,181,71,.055); }
+.overload-recommendation-group.avoid h5 { color: var(--amber); }
+.overload-no-reroll { border-left: 3px solid #69778a; padding: 8px 10px; color: var(--muted); background: rgba(105,119,138,.055); }
 .overload-goal { margin-top: 18px; border: 1px solid rgba(155,135,245,.4); border-radius: 14px; padding: 13px; background: linear-gradient(135deg, rgba(155,135,245,.08), transparent 45%), #0b1018; }
 .overload-goal h4 { margin-top: 0; }
 .overload-goal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

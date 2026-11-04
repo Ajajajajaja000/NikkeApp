@@ -46,6 +46,13 @@ describe("overload display and goals", () => {
     expect(optionMatchesTargets("攻撃力増加", targets)).toBe(false);
   });
 
+  it("妥協候補を自動目標に含めず、付けない効果は目標に含める", () => {
+    const record: NikkeRecord = { owned: true, favorite: true };
+    const targets = effectiveOverloadTargets(record, overloadRecommendation(15, "アニス：スパークリングサマー"));
+    expect(targets.some((target) => target.effect === "クリティカル確率増加")).toBe(false);
+    expect(targets.find((target) => target.effect === "最大装弾数増加")?.condition).toEqual({ type: "absent" });
+  });
+
   it("割合目標を枠数と混同せず合計値で判定する", () => {
     const record: NikkeRecord = { owned: true, favorite: true, imported: { gear: {
       head: { tier: "OL", level: 5, overload: true, options: [{ name: "チャージ速度増加", value: 2.9, unit: "%" }] },

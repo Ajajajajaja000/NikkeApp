@@ -45,7 +45,7 @@ describe("growth shortages", () => {
 
   it("必須オバロ目標の未達を育成目標に含める", () => {
     const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
-    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test" }], cubes: [], checked: "2026-11-03", sources: [], classification: "複数ソースで頻出" });
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test", kind: "ideal" }], cubes: [], checked: "2026-11-03", sources: [], classification: "現行ビルド表を主基準・複数ソース照合", investmentPriority: "中" });
     expect(shortages).toContain("オバロ不足 1項目");
   });
 });
