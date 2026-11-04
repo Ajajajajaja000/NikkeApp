@@ -41,7 +41,7 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
       <span className="blue-stat"><small>青字</small><strong>{result.blueLines}本</strong></span>
       <span className="black-stat"><small>黒帯</small><strong>{result.blackLines}本</strong></span>
     </div>
-    <p className="next-overload-action">{recommendation && visibleGoals.length === 0 ? "必須の再厳選目標はありません。OL化・装備レベルを優先してください。" : result.nextAction}</p>
+    <p className="next-overload-action">{recommendation && visibleGoals.length === 0 ? "厳選の必要はありません。OL化・装備レベルを優先してください。" : result.nextAction}</p>
     {editing && draft && <div className="overload-goal-editor" aria-label="オバロ目標の手動設定">
       {draft.map((goal, index) => <div className="overload-goal-edit-row" key={`edit-${index}`}>
         <select aria-label={`オバロ目標${index + 1}の効果`} value={goal.effect} onChange={(event) => update(index, { effect: event.target.value })}>{!effectOptions.includes(goal.effect) && <option>{goal.effect}</option>}{effectOptions.map((effect) => <option key={effect}>{effect}</option>)}</select>

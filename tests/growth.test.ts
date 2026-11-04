@@ -49,9 +49,9 @@ describe("growth shortages", () => {
     expect(shortages).toContain("オバロ不足 1項目");
   });
 
-  it("再厳選推奨なしを目標未設定として扱わない", () => {
+  it("厳選不要を目標未設定として扱わない", () => {
     const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
-    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [], checked: "2026-11-04", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "再厳選非推奨" });
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [], checked: "2026-11-04", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "厳選不要" });
     expect(shortages).toEqual([]);
   });
 });
