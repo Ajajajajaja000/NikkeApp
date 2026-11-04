@@ -137,7 +137,6 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .recommendation-meta.is-consensus strong { color: var(--teal); }
 .recommendation-meta.is-reference strong { color: var(--amber); }
 .recommendation-meta a { color: var(--teal); }
-.recommendation-source-links { display: flex; gap: 8px; flex-wrap: wrap; flex-basis: 100%; }
 .status-summary { display: grid; gap: 10px; }
 .import-missing { border: 1px dashed #425069; border-radius: 11px; padding: 14px; color: var(--muted); background: #0b1018; font-size: .8rem; line-height: 1.65; }
 .status-overview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
@@ -177,7 +176,6 @@ main { width: min(100%, 1120px); margin: 0 auto; padding: max(26px, env(safe-are
 .recommendation { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: #0b1018; }
 .recommendation p, .recommendation li, .recommendation a { font-size: .78rem; line-height: 1.55; }
 .recommendation ul { padding-left: 20px; }
-.recommendation-sources { display: flex; gap: 10px; flex-wrap: wrap; }
 .overload-recommendation-head { display: flex; gap: 5px 10px; flex-wrap: wrap; align-items: center; }
 .overload-recommendation-head strong { flex-basis: 100%; color: var(--teal); }
 .overload-recommendation-head span { border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; color: var(--muted); font-size: .65rem; }

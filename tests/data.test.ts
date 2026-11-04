@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { blablaErrorMessage, extractBlablaId, mergeImportedRecord, normalizeCharacter } from "../src/api/nikkeApi";
 import { effectiveLevel, effectiveSkills } from "../src/rules/growth";
-import { overloadRecommendation, overloadRecommendationCount } from "../src/data/overloadRecommendations";
+import { overloadRecommendation, overloadRecommendationCount, overloadTreasureRecommendationCount } from "../src/data/overloadRecommendations";
+import { releaseOrderResourceIds } from "../src/data/releaseOrder";
 
 describe("character identity and import", () => {
   it("レッドフードとラピ：レッドフードを別IDで保持する", () => {
@@ -46,14 +47,20 @@ describe("character identity and import", () => {
     expect(effectiveSkills(record)).toEqual([7, 8, 9]);
   });
 
-  it("オバロ推奨を多数収録し、同名をresourceIdで区別する", () => {
-    expect(overloadRecommendationCount).toBeGreaterThanOrEqual(50);
+  it("全206体と宝もの状態のオバロ推奨を収録し、resourceIdで区別する", () => {
+    expect(overloadRecommendationCount).toBe(206);
+    expect(overloadTreasureRecommendationCount).toBe(21);
+    expect(releaseOrderResourceIds.every((resourceId) => overloadRecommendation(resourceId, "") !== undefined)).toBe(true);
     expect(overloadRecommendation(470, "レッドフード")?.resourceId).toBe(470);
     expect(overloadRecommendation(16, "ラピ：レッドフード")?.resourceId).toBe(16);
     expect(overloadRecommendation(16, "ラピ：レッドフード")?.sources.map((source) => source.label)).toEqual(expect.arrayContaining(["Prydwen Character Builds", "Nikkers API", "NIKKE.GG Overload Gear Priority"]));
     expect(overloadRecommendation(16, "ラピ：レッドフード")?.priorities).toEqual(expect.arrayContaining([
       expect.objectContaining({ effect: "有利コードダメージ増加", target: "4枠", kind: "ideal" }),
       expect.objectContaining({ effect: "攻撃力増加", target: "4枠", kind: "ideal" }),
+    ]));
+    expect(overloadRecommendation(210, "エクシア", true)?.treasure).toBe(true);
+    expect(overloadRecommendation(210, "エクシア", true)?.priorities).toEqual(expect.arrayContaining([
+      expect.objectContaining({ effect: "最大装弾数増加", kind: "avoid" }),
     ]));
   });
 });

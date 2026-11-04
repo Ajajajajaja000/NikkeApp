@@ -103,7 +103,7 @@ export function TeamsPage({ catalog, records }: Props) {
         <div className="community-source">
           <span>掲載元更新日：{entry.team.source.updated.replaceAll("-", "/")}</span>
           <span>確認日：{entry.team.source.checked.replaceAll("-", "/")}</span>
-          <a href={entry.team.source.url} target="_blank" rel="noreferrer">{entry.team.source.title}で攻略を確認 ↗</a>
+          <span>掲載元：{entry.team.source.title}（リンクは設定の「出典・利用条件」に集約）</span>
         </div>
       </article>;
     })}
