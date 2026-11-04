@@ -42,7 +42,7 @@ const effectLabels: Record<string, string> = {
 
 const priorityLabels: Record<string, string> = {
   META: "メタ級", METAB: "メタ級（ボス）", VH: "非常に高い", H: "高い", MED: "中", MEDB: "中（ボス）", MEDP: "中（PvP）",
-  MEDPM: "中（PvPメタ）", L: "低い", LB: "低い（ボス）", LP: "低い（PvP）", VL: "非常に低い", NONE: "再厳選非推奨",
+  MEDPM: "中（PvPメタ）", L: "低い", LB: "低い（ボス）", LP: "低い（PvP）", VL: "非常に低い", NONE: "厳選不要",
 };
 
 function parseToken(token: string, kind: OverloadPriorityKind): OverloadPriority | undefined {

@@ -53,7 +53,7 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
     {recommendation ? <div className="recommendation">
       <p className="overload-recommendation-head"><strong>{recommendation.classification}</strong><span>厳選優先度：{recommendation.investmentPriority}</span><span>確認日 {recommendation.checked}</span></p>
       {idealOverloads.length > 0 ? <section className="overload-recommendation-group ideal"><h5>理想効果</h5><ul>{idealOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>
-        : <p className="overload-no-reroll">理想本数を断定できる再厳選推奨はありません。初回OL化や装備レベルを優先してください。</p>}
+        : <p className="overload-no-reroll">厳選の必要はありません。初回OL化や装備レベルを優先してください。</p>}
       {fillerOverloads.length > 0 && <section className="overload-recommendation-group filler"><h5>あったらなお良い</h5><ul>{fillerOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>}
       {avoidedOverloads.length > 0 && <section className="overload-recommendation-group avoid"><h5>付けない効果</h5><ul>{avoidedOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> — {item.reason}</li>)}</ul></section>}
     </div> : <p className="muted">このキャラは推奨情報との照合ができていません。推測値は表示しません。</p>}
