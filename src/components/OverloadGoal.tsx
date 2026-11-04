@@ -41,7 +41,7 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
       <span className="blue-stat"><small>青字</small><strong>{result.blueLines}本</strong></span>
       <span className="black-stat"><small>黒帯</small><strong>{result.blackLines}本</strong></span>
     </div>
-    <p className="next-overload-action">{result.nextAction}</p>
+    <p className="next-overload-action">{recommendation && visibleGoals.length === 0 ? "必須の再厳選目標はありません。OL化・装備レベルを優先してください。" : result.nextAction}</p>
     {editing && draft && <div className="overload-goal-editor" aria-label="オバロ目標の手動設定">
       {draft.map((goal, index) => <div className="overload-goal-edit-row" key={`edit-${index}`}>
         <select aria-label={`オバロ目標${index + 1}の効果`} value={goal.effect} onChange={(event) => update(index, { effect: event.target.value })}>{!effectOptions.includes(goal.effect) && <option>{goal.effect}</option>}{effectOptions.map((effect) => <option key={effect}>{effect}</option>)}</select>
@@ -64,7 +64,7 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
     {result.goals.length > 0 ? <div className="overload-goal-list">{result.goals.map((goal, index) => <div className={`overload-goal-row ${goal.met ? "met" : "missing"} ${goal.kind}`} key={`${goal.effect}-${index}`}>
       <div><strong>{goal.effect}</strong><small>{editing ? "編集中" : manual ? "手動目標" : "推奨"}：{goal.target}</small></div>
       <span>{goal.kind === "avoid" ? (goal.met ? "付与なし・達成" : `${goal.current}枠・非推奨`) : goal.unknown ? "数値を確認" : goal.target.includes("%") ? `現在 ${(goal.currentPercent ?? 0).toFixed(1)}% / ${goal.target}` : goal.minimum !== undefined ? `現在 ${goal.current} / 目標 ${goal.minimum}枠` : goal.met ? `現在 ${goal.current}枠` : "現在 0枠"}</span>
-    </div>)}</div> : <p className="muted">{recommendation ? "必須の再厳選目標はありません。必要なら「手動で変更」から目標を登録できます。" : "推奨を確認できていません。「手動で変更」から目標を登録できます。"}</p>}
+    </div>)}</div> : !recommendation ? <p className="muted">推奨を確認できていません。「手動で変更」から目標を登録できます。</p> : null}
     <p className="roll-legend"><span className="blue-sample">青字：ランク12〜14</span><span className="black-sample">黒帯：ランク15（最高値）</span></p>
   </section>;
 }
