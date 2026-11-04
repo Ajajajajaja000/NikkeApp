@@ -50,6 +50,10 @@ describe("character identity and import", () => {
     expect(overloadRecommendationCount).toBeGreaterThanOrEqual(50);
     expect(overloadRecommendation(470, "レッドフード")?.resourceId).toBe(470);
     expect(overloadRecommendation(16, "ラピ：レッドフード")?.resourceId).toBe(16);
-    expect(overloadRecommendation(16, "ラピ：レッドフード")?.sources.map((source) => source.label)).toEqual(expect.arrayContaining(["Nikkers API", "NIKKE.GG Overload Gear Priority"]));
+    expect(overloadRecommendation(16, "ラピ：レッドフード")?.sources.map((source) => source.label)).toEqual(expect.arrayContaining(["Prydwen Character Builds", "Nikkers API", "NIKKE.GG Overload Gear Priority"]));
+    expect(overloadRecommendation(16, "ラピ：レッドフード")?.priorities).toEqual(expect.arrayContaining([
+      expect.objectContaining({ effect: "有利コードダメージ増加", target: "4枠", kind: "ideal" }),
+      expect.objectContaining({ effect: "攻撃力増加", target: "4枠", kind: "ideal" }),
+    ]));
   });
 });

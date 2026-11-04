@@ -23,6 +23,9 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
   const currentSkills = effectiveSkills(value);
   const target = value.target ?? {};
   const recommendation = overloadRecommendation(character.resourceId, character.name);
+  const idealOverloads = recommendation?.priorities.filter((item) => item.kind === "ideal") ?? [];
+  const fillerOverloads = recommendation?.priorities.filter((item) => item.kind === "filler") ?? [];
+  const avoidedOverloads = recommendation?.priorities.filter((item) => item.kind === "avoid") ?? [];
   const growth = growthRecommendation(character.resourceId);
   const overloadTargets = effectiveOverloadTargets(value, recommendation);
   const set = (patch: Partial<NikkeRecord>) => onChange({ ...value, ...patch, displayName: character.name, manualUpdatedAt: new Date().toISOString() });
@@ -47,8 +50,11 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
 
     <h4>オバロ推奨</h4>
     {recommendation ? <div className="recommendation">
-      <p><strong>{recommendation.classification}</strong>（確認日 {recommendation.checked}）</p>
-      <ul>{recommendation.priorities.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target} — {item.reason}</li>)}</ul>
+      <p className="overload-recommendation-head"><strong>{recommendation.classification}</strong><span>厳選優先度：{recommendation.investmentPriority}</span><span>確認日 {recommendation.checked}</span></p>
+      {idealOverloads.length > 0 ? <section className="overload-recommendation-group ideal"><h5>理想効果</h5><ul>{idealOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>
+        : <p className="overload-no-reroll">理想本数を断定できる再厳選推奨はありません。初回OL化や装備レベルを優先してください。</p>}
+      {fillerOverloads.length > 0 && <section className="overload-recommendation-group filler"><h5>妥協・追加候補</h5><p>付いていてもよい候補です。自動の達成目標には含めません。</p><ul>{fillerOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>}
+      {avoidedOverloads.length > 0 && <section className="overload-recommendation-group avoid"><h5>付けない効果</h5><ul>{avoidedOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> — {item.reason}</li>)}</ul></section>}
       <p><strong>推奨キューブ：</strong>{recommendation.cubes.length > 0 ? recommendation.cubes.join(" / ") : "確認できる掲載なし"}</p>
       <div className="recommendation-sources">{recommendation.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div>
     </div> : <p className="muted">このキャラは公開ビルド情報との照合ができていません。推測値は表示しません。</p>}

@@ -63,7 +63,9 @@ export interface OverloadGoalRow {
 }
 
 export function effectiveOverloadTargets(record: NikkeRecord, recommendation: OverloadRecommendation | undefined): OverloadTarget[] {
-  return record.target?.overloadGoals ?? recommendation?.priorities.map(({ effect, target }) => parseOverloadTarget(effect, target)) ?? [];
+  return record.target?.overloadGoals ?? recommendation?.priorities
+    .filter(({ kind }) => kind !== "filler")
+    .map(({ effect, target }) => parseOverloadTarget(effect, target)) ?? [];
 }
 
 export function optionMatchesTargets(optionName: string, targets: OverloadTarget[]) {
