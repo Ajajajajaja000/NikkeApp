@@ -28,12 +28,12 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
     setDraft(null);
   };
   const reset = () => {
-    if (window.confirm("このニケの手動オバロ目標を削除して、公開推奨に戻しますか？")) onChange(undefined);
+    if (window.confirm("このニケの手動オバロ目標を削除して、推奨に戻しますか？")) onChange(undefined);
   };
   return <section className="overload-goal">
     <div className="overload-goal-head"><h4>オバロ目標</h4>{!editing && <div className="overload-goal-actions">
       <button className="text-button" type="button" onClick={startEditing}>{manual ? "手動目標を編集" : "手動で変更"}</button>
-      {manual && <button className="text-button danger-text" type="button" onClick={reset}>公開推奨に戻す</button>}
+      {manual && <button className="text-button danger-text" type="button" onClick={reset}>推奨に戻す</button>}
     </div>}</div>
     <div className="overload-goal-stats">
       <span><small>OL部位</small><strong>{result.overloadParts} / 4</strong></span>
@@ -62,9 +62,9 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
       <div className="edit-decision-row"><button type="button" className="primary" onClick={save} disabled={!draftValid}>変更を保存</button><button type="button" className="secondary" onClick={() => setDraft(null)}>キャンセル</button></div>
     </div>}
     {result.goals.length > 0 ? <div className="overload-goal-list">{result.goals.map((goal, index) => <div className={`overload-goal-row ${goal.met ? "met" : "missing"} ${goal.kind}`} key={`${goal.effect}-${index}`}>
-      <div><strong>{goal.effect}</strong><small>{editing ? "編集中" : manual ? "手動目標" : "公開推奨"}：{goal.target}</small></div>
+      <div><strong>{goal.effect}</strong><small>{editing ? "編集中" : manual ? "手動目標" : "推奨"}：{goal.target}</small></div>
       <span>{goal.kind === "avoid" ? (goal.met ? "付与なし・達成" : `${goal.current}枠・非推奨`) : goal.unknown ? "数値を確認" : goal.target.includes("%") ? `現在 ${(goal.currentPercent ?? 0).toFixed(1)}% / ${goal.target}` : goal.minimum !== undefined ? `現在 ${goal.current} / 目標 ${goal.minimum}枠` : goal.met ? `現在 ${goal.current}枠` : "現在 0枠"}</span>
-    </div>)}</div> : <p className="muted">公開推奨を確認できていません。「手動で変更」から目標を登録できます。</p>}
+    </div>)}</div> : <p className="muted">{recommendation ? "必須の再厳選目標はありません。必要なら「手動で変更」から目標を登録できます。" : "推奨を確認できていません。「手動で変更」から目標を登録できます。"}</p>}
     <p className="roll-legend"><span className="blue-sample">青字：ランク12〜14</span><span className="black-sample">黒帯：ランク15（最高値）</span></p>
   </section>;
 }

@@ -1,5 +1,5 @@
 import type { CharacterSummary, NikkeRecord } from "../types";
-import { effectiveLevel, growthStatus } from "../rules/growth";
+import { effectiveCollection, effectiveLevel, growthStatus } from "../rules/growth";
 import { NikkeStatusSummary } from "../components/NikkeStatusSummary";
 import { growthRecommendation } from "../data/growthRecommendations";
 import { overloadRecommendation } from "../data/overloadRecommendations";
@@ -17,7 +17,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
   const owned = catalog.filter((character) => records[character.id]?.owned);
   const favorites = catalog
     .filter((character) => records[character.id]?.favorite)
-    .sort((a, b) => growthStatus(records[b.id], growthRecommendation(b.resourceId)?.skills, overloadRecommendation(b.resourceId, b.name)).length - growthStatus(records[a.id], growthRecommendation(a.resourceId)?.skills, overloadRecommendation(a.resourceId, a.name)).length);
+    .sort((a, b) => growthStatus(records[b.id], growthRecommendation(b.resourceId)?.skills, overloadRecommendation(b.resourceId, b.name, effectiveCollection(records[b.id]).treasure)).length - growthStatus(records[a.id], growthRecommendation(a.resourceId)?.skills, overloadRecommendation(a.resourceId, a.name, effectiveCollection(records[a.id]).treasure)).length);
 
   return <section className="page">
     <header className="hero compact">
@@ -30,7 +30,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
     {favorites.length === 0 ? <div className="empty-state"><span>◎</span><h3>育成対象はまだありません</h3><p>ニケ一覧で「育成対象にする」を押すと、不足と詳細をここで追跡できます。</p><button className="primary" onClick={() => goNikkes()}>ニケを選ぶ</button></div> :
       <div className="growth-grid">{favorites.map((character, index) => {
         const record = records[character.id];
-        const overload = overloadRecommendation(character.resourceId, character.name);
+        const overload = overloadRecommendation(character.resourceId, character.name, effectiveCollection(record).treasure);
         const shortages = record.imported ? growthStatus(record, growthRecommendation(character.resourceId)?.skills, overload) : ["BlablaLink未取込"];
         const overloadTargets = effectiveOverloadTargets(record, overload);
         return <article className="growth-card" key={character.id}>

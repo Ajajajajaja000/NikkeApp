@@ -21,13 +21,13 @@ export const sources = [
     title: "Nikkers — キャラ別ビルド",
     url: "https://nikkers.cc/api",
     checked: "2026-11-03",
-    note: "公開APIで数値を確認できたskill target 195体分と、キャラ別notesから確認できた60体分のオバロ・キューブ推奨をresourceIdで静的収録。新キャラ追加・既存ビルド変更時だけ低頻度で確認する。実行時APIとしては使わず、未確認キャラへ推測で流用しない。",
+    note: "公開APIで数値を確認できたskill target 195体分とキャラ別notesを、スキル・オバロ・キューブ推奨の補助照合に使用。新キャラ追加・既存ビルド変更時だけ低頻度で確認し、実行時APIとしては使わない。",
   },
   {
     title: "Prydwen — Builds / Overload Gear",
     url: "https://www.prydwen.gg/nikke/builds",
-    checked: "2026-11-03",
-    note: "キャラ別ビルドの手動相互確認候補。公開APIと再配布許諾は未確認で、自動取得はCloudflareのHTTP 403となるため、実行時取得や回避は行わない。",
+    checked: "2026-11-04",
+    note: "全キャラOverload Gear表227行（通常206体と宝もの21状態）を一覧から一括確認し、本数と厳選優先度の主基準に使用。本文や表を複製せず、正規化した短い推奨だけを静的収録する。",
   },
   {
     title: "Prydwen — Overload Gear Rerolling",
@@ -46,6 +46,18 @@ export const sources = [
     url: "https://gamewith.jp/nikke/article/show/426750",
     checked: "2026-11-03",
     note: "日本語の手動相互確認候補。トーブの装弾数・攻撃力・有利コードの理由を確認し、該当キャラの補助出典として表示。掲載順を厳密な優先順位とは扱わない。",
+  },
+  {
+    title: "Game8 — オーバーロードのおすすめキャラと優先度",
+    url: "https://game8.jp/nikke/534126",
+    checked: "2026-11-04",
+    note: "2026-10-29更新。主力アタッカーで有利コードと攻撃力を優先する一般則、厳選優先キャラ、素材効率の説明を相互確認に使用。キャラ別の具体的な本数はPrydwenの全キャラ表を主基準とする。",
+  },
+  {
+    title: "GameWith — NIKKEキャラクターデータベース",
+    url: "https://gamewith.jp/nikke/",
+    checked: "2026-11-04",
+    note: "日本語名、キャラ別解説、個別ビルドの補助確認に使用。全件の一覧取得元にはせず、差異や特殊条件があるキャラだけを低頻度で確認する。",
   },
   {
     title: "GameWith — 最強パーティー編成まとめ",

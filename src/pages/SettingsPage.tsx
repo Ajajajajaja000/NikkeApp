@@ -58,7 +58,7 @@ export function SettingsPage({ data, catalog, catalogStatus, catalogLoading, con
     <div className="page-title"><p className="eyebrow">CONTROL</p><h1>設定</h1><p>更新・取り込み・バックアップ・出典</p></div>
     <article className="panel" aria-busy={catalogLoading}><div className="panel-head"><div><h2>マスターデータ</h2><p>{catalogStatus}</p></div><button className="secondary" onClick={onRefresh} disabled={catalogLoading}>{catalogLoading && <span className="spinner" aria-hidden="true" />}{catalogLoading ? "更新中…" : "手動更新"}</button></div><div className="status-row"><span>現在 {catalog.length}体</span><span>取得元 {data.catalogMeta?.source ?? "内蔵最小データ"}</span><span>取得日時 {data.catalogMeta ? new Date(data.catalogMeta.fetchedAt).toLocaleString("ja-JP") : "未取得"}</span></div></article>
 
-    <article className="panel" aria-busy={isSyncing}><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。キャラのマスターデータが未取得なら先に自動取得して、そのまま詳細取り込みへ進みます。手動のオバロ目標とメモは上書きしません。</p>
+    <article className="panel" aria-busy={isSyncing}><h2>BlablaLink詳細取り込み</h2><p>所持・レベル・スキル・装備・オバロ・キューブ・コレクションを公開プロフィールから取得します。キャラのマスターデータが未取得なら先に自動取得して、そのまま詳細取り込みへ進みます。手動のオバロ目標は上書きしません。</p>
       {connection ? <>
         <div className="status-row"><span>サーバー {connection.area ?? "自動判定"}</span><span>前回成功 {connection.lastSuccessAt ? new Date(connection.lastSuccessAt).toLocaleString("ja-JP") : "未取得"}</span><span>前回件数 {connection.lastCount ?? "—"}体</span></div>
         <label className="check wide"><input type="checkbox" checked={connection.autoSync} onChange={(event) => onConnectionChange({ ...connection, autoSync: event.target.checked })} />アプリを開いた時、前回の取り込み成功から1週間経過していれば自動で取り込む</label>

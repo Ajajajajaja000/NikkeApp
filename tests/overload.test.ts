@@ -38,7 +38,7 @@ describe("overload display and goals", () => {
     expect(result.nextAction).toContain("有利コードダメージ");
   });
 
-  it("手動目標を公開推奨より優先し、装備ラインとの一致を判定する", () => {
+  it("手動目標を推奨より優先し、装備ラインとの一致を判定する", () => {
     const record: NikkeRecord = { owned: true, favorite: true, target: { overloadGoals: [{ effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 2 }, priority: "required" }] } };
     const targets = effectiveOverloadTargets(record, overloadRecommendation(19, "マリアン：クイーン"));
     expect(targets).toEqual([{ effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 2 }, priority: "required" }]);

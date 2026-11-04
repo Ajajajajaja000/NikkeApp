@@ -68,7 +68,9 @@ export function growthShortages(record: NikkeRecord, recommendedSkills?: [number
 export function growthStatus(record: NikkeRecord, recommendedSkills: [number, number, number] | undefined, overloadRecommendation: OverloadRecommendation | undefined) {
   const shortages = growthShortages(record, recommendedSkills);
   const targets = effectiveOverloadTargets(record, overloadRecommendation);
-  if (!targets.length) shortages.push("オバロ目標未設定");
+  if (!targets.length) {
+    if (!overloadRecommendation) shortages.push("オバロ目標未設定");
+  }
   else {
     const result = assessOverload(record, targets);
     const required = result.goals.filter((goal) => goal.kind !== "optional");
