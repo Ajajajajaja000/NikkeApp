@@ -117,7 +117,7 @@ const rawRows: RawRow[] = [
   [225,"1M|1CS|4E|4A","3CS","META"], [226,"","","NONE"], [230,"4A|4CS|4E","","NONE"], [231,"4E|4A|4M","","MEDB"],
   [232,"4CS","4A|4E","MEDPM"], [233,"4A|4E","","VL","M"], [234,"4M|4E|4A","CR|CD","H"], [260,"4M|4A|4E","1HR|1-2CR","MEDB"],
   [261,"4CS","","LP"], [262,"4E|4A|1M","3CS|3CD","META"], [330,"2M|4E|4A","CR|CD|M","VH"], [331,"","","VL"],
-  [470,"4E|1-2M|4A","2-3CS","VH"], [471,"4E|4A","1M|3-4CR|3-4CD","META","CS"], [472,"","","NONE"], [473,"","","NONE"],
+  [470,"4E|1-2M|4A","2-3CS","VH"], [471,"4E|4A","1M|3-4CR|3-4CD","META","CS"], [472,"4E|4A","3-4CD|0-1M|0-1CR","高い（実装直後）"], [473,"","","NONE"],
   [511,"4E|4A|2M","1-3CR|1-3CD|1-2M","META"], [513,"4E|4A","4CR|4CD|4M","VH"], [514,"4E|4A|4CD","","MED","M"],
   [515,"4E|4A|3-4M","CD|CR","META","CS"], [23,"","4M|4E|4A","VL"], [800,"","","VL"], [801,"4A|4CS|4E","","NONE"],
   [802,"","","NONE"], [810,"4E|4CD","4CR|4A","LB"], [811,"4E|4A|4CS","1-2M","LP"], [812,"1-2M","","NONE"],
@@ -126,7 +126,7 @@ const rawRows: RawRow[] = [
   [835,"4E|4M|4A","","H"], [836,"","","NONE"], [840,"4E|1-2M|4A","4CD|4CS","MEDB"], [841,"4E|4A","","LP"],
   [842,"","","NONE"], [850,"4E|4A|4CD","1-2CR|1M","MEDB"], [851,"4E|4A","CR|CD|1M","H"], [852,"","","NONE"],
   [860,"4E|4A|2-3M","2HR|2CR|2CD","MEDB"], [861,"4E|4A|2M","2HR|2CR|2CD","MED"], [862,"","","NONE"],
-  [870,"4E","A|CR|CD|M","MEDB"], [871,"4E|2-3M","A|CR|CD|M","MEDB"], [872,"4E|4A","3-4CD|0-1M|0-1CR","高い（実装直後）"],
+  [870,"4E","A|CR|CD|M","MEDB"], [871,"4E|2-3M","A|CR|CD|M","MEDB"], [872,"","","NONE"],
 
   // 宝もの解放時は同じresourceIdの通常推奨よりこちらを優先する。
   [550,"4CS","4A|4E|4DEF","MEDPM","",true], [80,"4CS|2M","4E|2A","MEDPM","",true], [72,"2-3M","","VL","",true],
@@ -154,7 +154,7 @@ function toRecommendation([resourceId, ideal, filler, priority, avoid = "", trea
     reviewStatus,
     ...(treasure ? { treasure: true } : {}),
   };
-  if (resourceId !== 872 || treasure) return base;
+  if (resourceId !== 472 || treasure) return base;
   return {
     ...base,
     checked: "2026-11-05",
@@ -169,7 +169,7 @@ const recommendations: OverloadRecommendation[] = [
   ...unverifiedRawRows.map((row) => toRecommendation(row, "unverified")),
 ];
 
-const fallbackNameIds: Record<string, number> = { "マリアン：クイーン": 19, "ラピ：レッドフード": 16, "レッドフード": 470 };
+const fallbackNameIds: Record<string, number> = { "マリアン：クイーン": 19, "ラピ：レッドフード": 16, "レッドフード": 470, "紅蓮：神殺": 472 };
 
 export function overloadRecommendation(resourceId: number | undefined, formalName: string, treasure = false): OverloadRecommendation | undefined {
   const key = resourceId ?? fallbackNameIds[formalName];

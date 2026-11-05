@@ -62,6 +62,7 @@ describe("growth shortages", () => {
   });
 
   it("紅蓮：神殺の実装後スキル目標を使う", () => {
-    expect(growthRecommendation(872)).toMatchObject({ skills: [10, 10, 10], agreement: "複数ソース一致", checked: "2026-11-05" });
+    expect(growthRecommendation(472)).toMatchObject({ skills: [10, 10, 10], agreement: "複数ソース一致", checked: "2026-11-05" });
+    expect(growthRecommendation(872)).toMatchObject({ skills: [1, 1, 1], agreement: "単一ソース参考" });
   });
 });
