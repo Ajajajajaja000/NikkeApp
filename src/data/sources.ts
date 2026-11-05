@@ -42,6 +42,30 @@ export const sources = [
     note: "推奨効果・本数・注意点の手動相互確認候補。公開ページは確認できたが、推奨データの再利用を許可するAPI・ライセンスは未確認のため一括取得しない。",
   },
   {
+    title: "NIKKE.GG — Scarlet: Goddeath Early Analysis",
+    url: "https://nikke.gg/scarlet-goddeath-early-analysis/",
+    checked: "2026-11-05",
+    note: "紅蓮：神殺の実装直後分析。スキル最終目標10/10/10と、有利コード・攻撃力・クリティカルダメージを中心とするオバロ候補の照合に使用。速報値であることを前提に採用する。",
+  },
+  {
+    title: "ニケハブ — 紅蓮：神殺",
+    url: "https://nikkehub.com/ja/nikkes/scarlet-goddeath",
+    checked: "2026-11-05",
+    note: "実装日、resourceIdとの対応、オバロ効果ごとのシミュレーション結果を確認。有利コード4枠・攻撃力4枠と残り候補の照合に使用。実装直後の数値は今後変わり得るものとして扱う。",
+  },
+  {
+    title: "TL&D — 紅蓮：神殺ガイド",
+    url: "https://tlnd.cc/blog/ja/nikke/scarlet-goddeath",
+    checked: "2026-11-05",
+    note: "スキル最終目標10/10/10、有利コード4枠・攻撃力4枠・クリティカルダメージ中心のオバロ推奨を相互確認。",
+  },
+  {
+    title: "オレGAME — 紅蓮：神殺オバロ期待値",
+    url: "https://ore-game.com/nikke/post/scarlet-goddeath/",
+    checked: "2026-11-05",
+    note: "実装後の期待値比較で、有利コード4枠、攻撃力4枠、クリティカルダメージの順を確認。最後の枠は他ソースと評価が分かれるため必須目標にはしない。",
+  },
+  {
     title: "GameWith — キャラ別おすすめオバロ",
     url: "https://gamewith.jp/nikke/article/show/426750",
     checked: "2026-11-03",

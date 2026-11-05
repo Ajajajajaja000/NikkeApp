@@ -62,5 +62,16 @@ describe("character identity and import", () => {
     expect(overloadRecommendation(210, "エクシア", true)?.priorities).toEqual(expect.arrayContaining([
       expect.objectContaining({ effect: "最大装弾数増加", kind: "avoid" }),
     ]));
+    expect(overloadRecommendation(872, "紅蓮：神殺")).toMatchObject({
+      checked: "2026-11-05",
+      reviewStatus: "confirmed",
+      classification: "実装後・複数ソース照合",
+      investmentPriority: "高い（実装直後）",
+    });
+    expect(overloadRecommendation(872, "紅蓮：神殺")?.priorities).toEqual(expect.arrayContaining([
+      expect.objectContaining({ effect: "有利コードダメージ増加", target: "4枠", kind: "ideal" }),
+      expect.objectContaining({ effect: "攻撃力増加", target: "4枠", kind: "ideal" }),
+      expect.objectContaining({ effect: "クリティカルダメージ増加", target: "3〜4枠", kind: "filler" }),
+    ]));
   });
 });

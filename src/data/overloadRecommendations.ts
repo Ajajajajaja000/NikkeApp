@@ -12,8 +12,10 @@ export interface OverloadRecommendation {
   priorities: OverloadPriority[];
   checked: string;
   sources: Array<{ label: string; url: string }>;
-  classification: "全キャラ表を主基準・複数ソース照合";
+  classification: "全キャラ表を主基準・複数ソース照合" | "実装後・複数ソース照合" | "未確認";
   investmentPriority: string;
+  reviewStatus: "confirmed" | "unverified";
+  note?: string;
   treasure?: boolean;
 }
 
@@ -26,6 +28,13 @@ const sources = [
   { label: "Game8 オーバーロード", url: "https://game8.jp/nikke/534126" },
   { label: "GameWith NIKKE攻略", url: "https://gamewith.jp/nikke/" },
   { label: "Nikkers API", url: "https://nikkers.cc/api" },
+];
+
+const goddeathSources = [
+  { label: "NIKKE.GG Scarlet: Goddeath Early Analysis", url: "https://nikke.gg/scarlet-goddeath-early-analysis/" },
+  { label: "ニケハブ 紅蓮：神殺", url: "https://nikkehub.com/ja/nikkes/scarlet-goddeath" },
+  { label: "TL&D 紅蓮：神殺ガイド", url: "https://tlnd.cc/blog/ja/nikke/scarlet-goddeath" },
+  { label: "オレGAME 紅蓮：神殺オバロ期待値", url: "https://ore-game.com/nikke/post/scarlet-goddeath/" },
 ];
 
 const effectLabels: Record<string, string> = {
@@ -117,7 +126,7 @@ const rawRows: RawRow[] = [
   [835,"4E|4M|4A","","H"], [836,"","","NONE"], [840,"4E|1-2M|4A","4CD|4CS","MEDB"], [841,"4E|4A","","LP"],
   [842,"","","NONE"], [850,"4E|4A|4CD","1-2CR|1M","MEDB"], [851,"4E|4A","CR|CD|1M","H"], [852,"","","NONE"],
   [860,"4E|4A|2-3M","2HR|2CR|2CD","MEDB"], [861,"4E|4A|2M","2HR|2CR|2CD","MED"], [862,"","","NONE"],
-  [870,"4E","A|CR|CD|M","MEDB"], [871,"4E|2-3M","A|CR|CD|M","MEDB"], [872,"","","NONE"],
+  [870,"4E","A|CR|CD|M","MEDB"], [871,"4E|2-3M","A|CR|CD|M","MEDB"], [872,"4E|4A","3-4CD|0-1M|0-1CR","高い（実装直後）"],
 
   // 宝もの解放時は同じresourceIdの通常推奨よりこちらを優先する。
   [550,"4CS","4A|4E|4DEF","MEDPM","",true], [80,"4CS|2M","4E|2A","MEDPM","",true], [72,"2-3M","","VL","",true],
@@ -130,15 +139,35 @@ const rawRows: RawRow[] = [
   [390,"4E|4A","2HR|2CR|2CD","LB","",true],
 ];
 
-const recommendations: OverloadRecommendation[] = rawRows.map(([resourceId, ideal, filler, priority, avoid = "", treasure]) => ({
-  resourceId,
-  priorities: [...parseEffects(ideal, "ideal"), ...parseEffects(filler, "filler"), ...parseEffects(avoid, "avoid")],
-  checked,
-  sources,
-  classification: "全キャラ表を主基準・複数ソース照合",
-  investmentPriority: priorityLabels[priority] ?? priority,
-  ...(treasure ? { treasure: true } : {}),
-}));
+// 実装前などで推奨を確認できないIDはrawRowsへ空欄で追加せず、こちらで明示する。
+// 「未確認」と、確認のうえで目標がない「厳選不要」を画面と不足判定で区別するための台帳。
+const unverifiedRawRows: RawRow[] = [];
+
+function toRecommendation([resourceId, ideal, filler, priority, avoid = "", treasure]: RawRow, reviewStatus: OverloadRecommendation["reviewStatus"]): OverloadRecommendation {
+  const base: OverloadRecommendation = {
+    resourceId,
+    priorities: [...parseEffects(ideal, "ideal"), ...parseEffects(filler, "filler"), ...parseEffects(avoid, "avoid")],
+    checked,
+    sources,
+    classification: reviewStatus === "unverified" ? "未確認" : "全キャラ表を主基準・複数ソース照合",
+    investmentPriority: reviewStatus === "unverified" ? "未確認" : priorityLabels[priority] ?? priority,
+    reviewStatus,
+    ...(treasure ? { treasure: true } : {}),
+  };
+  if (resourceId !== 872 || treasure) return base;
+  return {
+    ...base,
+    checked: "2026-11-05",
+    sources: goddeathSources,
+    classification: "実装後・複数ソース照合",
+    note: "有利コード4枠・攻撃力4枠は複数ソースで一致。残りはクリティカルダメージ3〜4枠が有力ですが、最後の1枠は最大装弾数とクリティカル確率で評価が分かれるため追加候補としています。",
+  };
+}
+
+const recommendations: OverloadRecommendation[] = [
+  ...rawRows.map((row) => toRecommendation(row, "confirmed")),
+  ...unverifiedRawRows.map((row) => toRecommendation(row, "unverified")),
+];
 
 const fallbackNameIds: Record<string, number> = { "マリアン：クイーン": 19, "ラピ：レッドフード": 16, "レッドフード": 470 };
 

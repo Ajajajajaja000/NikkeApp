@@ -45,13 +45,23 @@ describe("growth shortages", () => {
 
   it("必須オバロ目標の未達を育成目標に含める", () => {
     const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
-    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test", kind: "ideal" }], checked: "2026-11-03", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "中" });
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [{ effect: "攻撃力増加", target: "1枠", reason: "test", kind: "ideal" }], checked: "2026-11-03", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "中", reviewStatus: "confirmed" });
     expect(shortages).toContain("オバロ不足 1項目");
   });
 
   it("厳選不要を目標未設定として扱わない", () => {
     const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-03T00:00:00Z", source: "test" } };
-    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [], checked: "2026-11-04", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "厳選不要" });
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 1, priorities: [], checked: "2026-11-04", sources: [], classification: "全キャラ表を主基準・複数ソース照合", investmentPriority: "厳選不要", reviewStatus: "confirmed" });
     expect(shortages).toEqual([]);
+  });
+
+  it("未確認の空欄を厳選不要として扱わない", () => {
+    const record = { owned: true, favorite: true, imported: { skills: [10, 10, 10] as [number, number, number], fetchedAt: "2026-11-05T00:00:00Z", source: "test" } };
+    const shortages = growthStatus(record, [10, 10, 10], { resourceId: 999, priorities: [], checked: "2026-11-05", sources: [], classification: "未確認", investmentPriority: "未確認", reviewStatus: "unverified" });
+    expect(shortages).toContain("オバロ目標未設定");
+  });
+
+  it("紅蓮：神殺の実装後スキル目標を使う", () => {
+    expect(growthRecommendation(872)).toMatchObject({ skills: [10, 10, 10], agreement: "複数ソース一致", checked: "2026-11-05" });
   });
 });

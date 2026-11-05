@@ -52,10 +52,13 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
     <h4>オバロ推奨</h4>
     {recommendation ? <div className="recommendation">
       <p className="overload-recommendation-head"><strong>{recommendation.classification}</strong><span>厳選優先度：{recommendation.investmentPriority}</span><span>確認日 {recommendation.checked}</span></p>
-      {idealOverloads.length > 0 ? <section className="overload-recommendation-group ideal"><h5>理想効果</h5><ul>{idealOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>
-        : <p className="overload-no-reroll">厳選の必要はありません。初回OL化や装備レベルを優先してください。</p>}
+      {recommendation.reviewStatus === "unverified" ? <p className="overload-no-reroll">推奨情報をまだ確認できていません。情報がないことを「厳選不要」とは扱いません。</p>
+        : idealOverloads.length > 0 ? <section className="overload-recommendation-group ideal"><h5>理想効果</h5><ul>{idealOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>
+          : recommendation.investmentPriority === "厳選不要" ? <p className="overload-no-reroll">厳選の必要はありません。初回OL化や装備レベルを優先してください。</p>
+            : <p className="overload-no-reroll">必須の厳選目標はありません。追加候補を参考にしてください。</p>}
       {fillerOverloads.length > 0 && <section className="overload-recommendation-group filler"><h5>あったらなお良い</h5><ul>{fillerOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> {item.target}</li>)}</ul></section>}
       {avoidedOverloads.length > 0 && <section className="overload-recommendation-group avoid"><h5>付けない効果</h5><ul>{avoidedOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> — {item.reason}</li>)}</ul></section>}
+      {recommendation.note && <p className="muted">{recommendation.note}</p>}
     </div> : <p className="muted">このキャラは推奨情報との照合ができていません。推測値は表示しません。</p>}
 
     <h4>推奨キューブ</h4>
