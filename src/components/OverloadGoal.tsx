@@ -20,6 +20,8 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
   const draftValid = draft?.every((goal) => goal.condition.type !== "lines" || (Number.isInteger(goal.condition.minimum) && goal.condition.minimum >= 1 && goal.condition.minimum <= 4))
     && draft?.every((goal) => goal.condition.type !== "percent" || goal.condition.minimum > 0);
   const result = assessOverload(record, visibleGoals);
+  const recommendationPending = recommendation?.reviewStatus === "unverified";
+  const noRerollNeeded = recommendation?.reviewStatus === "confirmed" && recommendation.investmentPriority === "厳選不要";
   const startEditing = () => setDraft(goals.length ? goals.map((goal) => ({ ...goal, condition: { ...goal.condition } })) : [{ effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 1 }, priority: "required" }]);
   const update = (index: number, patch: Partial<OverloadTarget>) => setDraft((current) => current?.map((goal, row) => row === index ? { ...goal, ...patch } : goal) ?? null);
   const save = () => {
@@ -41,7 +43,13 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
       <span className="blue-stat"><small>青字</small><strong>{result.blueLines}本</strong></span>
       <span className="black-stat"><small>黒帯</small><strong>{result.blackLines}本</strong></span>
     </div>
-    <p className="next-overload-action">{recommendation && visibleGoals.length === 0 ? "厳選の必要はありません。OL化・装備レベルを優先してください。" : result.nextAction}</p>
+    <p className="next-overload-action">{recommendationPending && visibleGoals.length === 0
+      ? "推奨情報をまだ確認できていません。必要な効果を厳選不要とは判定しません。"
+      : noRerollNeeded && visibleGoals.length === 0
+        ? "厳選の必要はありません。OL化・装備レベルを優先してください。"
+        : recommendation && visibleGoals.length === 0
+          ? "必須の厳選目標はありません。追加候補は下の推奨情報を確認してください。"
+          : result.nextAction}</p>
     {editing && draft && <div className="overload-goal-editor" aria-label="オバロ目標の手動設定">
       {draft.map((goal, index) => <div className="overload-goal-edit-row" key={`edit-${index}`}>
         <select aria-label={`オバロ目標${index + 1}の効果`} value={goal.effect} onChange={(event) => update(index, { effect: event.target.value })}>{!effectOptions.includes(goal.effect) && <option>{goal.effect}</option>}{effectOptions.map((effect) => <option key={effect}>{effect}</option>)}</select>
@@ -64,7 +72,7 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
     {result.goals.length > 0 ? <div className="overload-goal-list">{result.goals.map((goal, index) => <div className={`overload-goal-row ${goal.met ? "met" : "missing"} ${goal.kind}`} key={`${goal.effect}-${index}`}>
       <div><strong>{goal.effect}</strong><small>{editing ? "編集中" : manual ? "手動目標" : "推奨"}：{goal.target}</small></div>
       <span>{goal.kind === "avoid" ? (goal.met ? "付与なし・達成" : `${goal.current}枠・非推奨`) : goal.unknown ? "数値を確認" : goal.target.includes("%") ? `現在 ${(goal.currentPercent ?? 0).toFixed(1)}% / ${goal.target}` : goal.minimum !== undefined ? `現在 ${goal.current} / 目標 ${goal.minimum}枠` : goal.met ? `現在 ${goal.current}枠` : "現在 0枠"}</span>
-    </div>)}</div> : !recommendation ? <p className="muted">推奨を確認できていません。「手動で変更」から目標を登録できます。</p> : null}
+    </div>)}</div> : !recommendation || recommendationPending ? <p className="muted">推奨を確認できていません。「手動で変更」から目標を登録できます。</p> : null}
     <p className="roll-legend"><span className="blue-sample">青字：ランク12〜14</span><span className="black-sample">黒帯：ランク15（最高値）</span></p>
   </section>;
 }

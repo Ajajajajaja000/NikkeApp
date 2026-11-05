@@ -10,6 +10,8 @@ const checked = "2026-11-04";
 const nikkersSource = { label: "Nikkers API", url: "https://nikkers.cc/api" };
 const prydwenSource = { label: "Prydwen Character Builds", url: "https://www.prydwen.gg/nikke/builds" };
 const nikkeGgSource = { label: "NIKKE.GG Skill Priority", url: "https://nikke.gg/skill-priority-guide/" };
+const goddeathNikkeGgSource = { label: "NIKKE.GG Scarlet: Goddeath Early Analysis", url: "https://nikke.gg/scarlet-goddeath-early-analysis/" };
+const goddeathTlndSource = { label: "TL&D 紅蓮：神殺ガイド", url: "https://tlnd.cc/blog/ja/nikke/scarlet-goddeath" };
 
 // Nikkers公開APIの推奨値を、開発時の手動コマンド1回で更新した静的データ。
 // アプリ利用中はNikkersへ通信せず、resourceIdで別衣装も厳密に区別する。
@@ -208,7 +210,7 @@ const skillTargets: Record<number, [number, number, number]> = {
   862: [1,1,1],
   870: [1,1,1],
   871: [1,1,1],
-  872: [1,1,1],
+  872: [10,10,10],
 };
 
 // 2つ以上の公開攻略で同じ最終目標を確認できたキャラだけを優先採用する。
@@ -223,12 +225,13 @@ const consensusTargets: Record<number, Omit<GrowthRecommendation, "checked">> = 
   451: { skills: [10,4,4], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
   470: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
   601: { skills: [7,7,7], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
+  872: { skills: [10,10,10], agreement: "複数ソース一致", sources: [goddeathNikkeGgSource, goddeathTlndSource], note: "実装直後の確認値です。バースト、スキル1、スキル2の順で育成し、最終目標は10/10/10です。" },
 };
 
 export function growthRecommendation(resourceId: number | undefined): GrowthRecommendation | undefined {
   if (resourceId === undefined) return undefined;
   const consensus = consensusTargets[resourceId];
-  if (consensus) return { ...consensus, checked };
+  if (consensus) return { ...consensus, checked: resourceId === 872 ? "2026-11-05" : checked };
   const skills = skillTargets[resourceId];
   return skills ? {
     skills,
