@@ -162,6 +162,7 @@ const skillTargets: Record<number, [number, number, number]> = {
   451: [10,4,4],
   470: [10,10,10],
   471: [10,10,10],
+  472: [10,10,10],
   500: [1,1,1],
   501: [1,1,1],
   502: [7,7,4],
@@ -210,7 +211,7 @@ const skillTargets: Record<number, [number, number, number]> = {
   862: [1,1,1],
   870: [1,1,1],
   871: [1,1,1],
-  872: [10,10,10],
+  872: [1,1,1],
 };
 
 // 2つ以上の公開攻略で同じ最終目標を確認できたキャラだけを優先採用する。
@@ -225,13 +226,13 @@ const consensusTargets: Record<number, Omit<GrowthRecommendation, "checked">> = 
   451: { skills: [10,4,4], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
   470: { skills: [10,10,10], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
   601: { skills: [7,7,7], agreement: "複数ソース一致", sources: [nikkersSource, prydwenSource] },
-  872: { skills: [10,10,10], agreement: "複数ソース一致", sources: [goddeathNikkeGgSource, goddeathTlndSource], note: "実装直後の確認値です。バースト、スキル1、スキル2の順で育成し、最終目標は10/10/10です。" },
+  472: { skills: [10,10,10], agreement: "複数ソース一致", sources: [goddeathNikkeGgSource, goddeathTlndSource], note: "実装直後の確認値です。バースト、スキル1、スキル2の順で育成し、最終目標は10/10/10です。" },
 };
 
 export function growthRecommendation(resourceId: number | undefined): GrowthRecommendation | undefined {
   if (resourceId === undefined) return undefined;
   const consensus = consensusTargets[resourceId];
-  if (consensus) return { ...consensus, checked: resourceId === 872 ? "2026-11-05" : checked };
+  if (consensus) return { ...consensus, checked: resourceId === 472 ? "2026-11-05" : checked };
   const skills = skillTargets[resourceId];
   return skills ? {
     skills,
