@@ -38,6 +38,7 @@ export interface CharacterDetail extends CharacterSummary {
 export interface GearRecord {
   id?: number;
   name?: string;
+  icon?: string;
   corporation?: string;
   tier: string;
   level: number;

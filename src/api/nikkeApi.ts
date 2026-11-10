@@ -125,7 +125,7 @@ function firstNumber(...values: unknown[]): number | undefined {
   return undefined;
 }
 
-type MasterItem = { id: number; name: string; rare?: string; slot?: string; corporation?: string; rank?: number };
+type MasterItem = { id: number; name: string; icon?: string; rare?: string; slot?: string; corporation?: string; rank?: number };
 export interface ImportedRosterRow { nameCode: number; resourceId?: number; snapshot: ImportedSnapshot }
 export interface ImportedRoster { rows: ImportedRosterRow[]; area?: number; fetchedAt: string }
 
@@ -152,6 +152,7 @@ function parseGear(detail: JsonObject, equips: Map<number, MasterItem>, options:
     result[normalizeSlot(rawSlot)] = {
       id: tid,
       name: master?.name ?? "装備情報未取得",
+      icon: master?.icon,
       corporation: master?.corporation,
       tier: parsedOptions.length ? "OL" : (master?.rare ?? "未設定"),
       level: firstNumber(detail[`${rawSlot}_equip_lv`], detail[`${rawSlot}_equip_level`]) ?? 0,
@@ -175,7 +176,7 @@ function listMap(json: unknown, key: string): Map<number, MasterItem> {
   const rows = obj(json)[key];
   return new Map((Array.isArray(rows) ? rows : []).map((raw) => {
     const item = obj(raw);
-    return [Number(item.id), { id: Number(item.id), name: text(item.name) || `${item.id}`, rare: text(item.rare), slot: text(item.slot), corporation: text(item.corporation), rank: firstNumber(item.rank) }];
+    return [Number(item.id), { id: Number(item.id), name: text(item.name) || `${item.id}`, icon: text(item.icon) || undefined, rare: text(item.rare), slot: text(item.slot), corporation: text(item.corporation), rank: firstNumber(item.rank) }];
   }));
 }
 

@@ -6,7 +6,7 @@ const slots: Array<{ id: GearSlot; label: string }> = [
   { id: "head", label: "頭" },
   { id: "chest", label: "胴" },
   { id: "arms", label: "腕" },
-  { id: "legs", label: "足" },
+  { id: "legs", label: "脚" },
 ];
 
 function limitBreakLabel(value: number) {
@@ -33,7 +33,11 @@ export function NikkeStatusSummary({ record, overloadTargets = [] }: { record: N
       {slots.map((slot) => {
         const gear = effectiveGear(record, slot.id);
         return <section className={`equipment-card ${gear.overload ? "overloaded" : ""}`} key={slot.id}>
-          <div className="equipment-head"><strong>{slot.label}</strong><span>{gear.tier} · Lv.{gear.level}</span>{gear.overload && <b>OL</b>}</div>
+          <div className="equipment-head">
+            <div className="equipment-icon">{gear.icon ? <img src={gear.icon} alt="" loading="lazy" /> : <span>{slot.label}</span>}</div>
+            <div className="equipment-title"><strong>{slot.label}</strong><span>{gear.tier} · Lv.{gear.level}</span></div>
+            {gear.overload && <b>OL</b>}
+          </div>
           {gear.options?.length ? <ul className="overload-options">{gear.options.map((option, index) => {
             const style = overloadRollStyle(option.rank);
             const matchesGoal = optionMatchesTargets(option.name, overloadTargets);
