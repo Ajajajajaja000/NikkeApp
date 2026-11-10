@@ -65,7 +65,6 @@ export function OverloadGoal({ record, recommendation, onChange }: Props) {
         <button type="button" className="icon-button" aria-label={`オバロ目標${index + 1}を削除`} onClick={() => setDraft(draft.filter((_, row) => row !== index))}>×</button>
       </div>)}
       <button type="button" className="secondary add-goal" onClick={() => setDraft([...draft, { effect: "有利コードダメージ増加", condition: { type: "lines", minimum: 1 }, priority: "required" }])}>＋ 効果を追加</button>
-      <p className="muted">入力中はまだ保存されません。内容を確認して「変更を保存」を押してください。</p>
       {!draftValid && <p className="error-text">枠数は1〜4の整数、合計値は0より大きい数値で入力してください。</p>}
       <div className="edit-decision-row"><button type="button" className="primary" onClick={save} disabled={!draftValid}>変更を保存</button><button type="button" className="secondary" onClick={() => setDraft(null)}>キャンセル</button></div>
     </div>}

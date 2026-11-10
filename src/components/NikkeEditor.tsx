@@ -19,7 +19,7 @@ interface Props {
 }
 
 type GrowthTarget = NonNullable<NikkeRecord["target"]>;
-type DetailTab = "growth" | "equipment" | "recommendation";
+type DetailTab = "growth" | "equipment" | "skills";
 
 export function NikkeEditor({ character, record, detail, detailLoading, detailError, onChange }: Props) {
   const [activeTab, setActiveTab] = useState<DetailTab>("growth");
@@ -41,7 +41,7 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
     <div className="detail-tabs" role="tablist" aria-label="ニケ詳細の表示内容">
       <button type="button" role="tab" aria-selected={activeTab === "growth"} className={activeTab === "growth" ? "active" : ""} onClick={() => setActiveTab("growth")}>育成</button>
       <button type="button" role="tab" aria-selected={activeTab === "equipment"} className={activeTab === "equipment" ? "active" : ""} onClick={() => setActiveTab("equipment")}>装備・OL</button>
-      <button type="button" role="tab" aria-selected={activeTab === "recommendation"} className={activeTab === "recommendation" ? "active" : ""} onClick={() => setActiveTab("recommendation")}>推奨</button>
+      <button type="button" role="tab" aria-selected={activeTab === "skills"} className={activeTab === "skills" ? "active" : ""} onClick={() => setActiveTab("skills")}>スキル詳細</button>
     </div>
 
     {activeTab === "growth" && <section className="detail-section" role="tabpanel">
@@ -56,15 +56,14 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
         <strong>{growth.agreement}</strong><span>確認日 {growth.checked}</span>
         {growth.note && <span>{growth.note}</span>}
       </div>}
+      <h2>推奨キューブ</h2>
+      <div className="recommendation cube-recommendation"><p>{cube ? cube.cubes.join(" / ") : "確認できる推奨はありません"}</p></div>
     </section>}
 
     {activeTab === "equipment" && <section className="detail-section" role="tabpanel">
       <h2>装備・オーバーロード</h2>
       <NikkeEquipmentSummary record={value} overloadTargets={overloadTargets} />
       <OverloadGoal record={value} recommendation={recommendation} onChange={(overloadGoals) => setTarget({ overloadGoals })} />
-    </section>}
-
-    {activeTab === "recommendation" && <section className="detail-section" role="tabpanel">
       <h2>オバロ推奨</h2>
       {recommendation ? <div className="recommendation">
         <p className="overload-recommendation-head"><strong>{recommendation.classification}</strong><span>厳選優先度：{recommendation.investmentPriority}</span><span>確認日 {recommendation.checked}</span></p>
@@ -76,10 +75,9 @@ export function NikkeEditor({ character, record, detail, detailLoading, detailEr
         {avoidedOverloads.length > 0 && <section className="overload-recommendation-group avoid"><h5>付けない効果</h5><ul>{avoidedOverloads.map((item, index) => <li key={`${item.effect}-${index}`}><strong>{item.effect}</strong> — {item.reason}</li>)}</ul></section>}
         {recommendation.note && <p className="muted">{recommendation.note}</p>}
       </div> : <p className="muted">このキャラは推奨情報との照合ができていません。推測値は表示しません。</p>}
+    </section>}
 
-      <h2>推奨キューブ</h2>
-      <div className="recommendation cube-recommendation"><p>{cube ? cube.cubes.join(" / ") : "確認できる推奨はありません"}</p></div>
-
+    {activeTab === "skills" && <section className="detail-section" role="tabpanel">
       <h2>スキル詳細</h2>
       {detailLoading && <p className="muted" role="status"><span className="spinner" aria-hidden="true" />スキル情報を取得中…</p>}
       {detailError && <p className="error-text">{detailError}</p>}

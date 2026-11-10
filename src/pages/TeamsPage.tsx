@@ -27,18 +27,7 @@ export function TeamsPage({ catalog, records }: Props) {
     <div className="page-title">
       <p className="eyebrow">COMMUNITY TEAMS</p>
       <h1>編成支援</h1>
-      <p>公開攻略で紹介された完成編成を、所持状況と照らして確認できます。</p>
     </div>
-
-    <article className="panel community-policy">
-      <h2>この画面について</h2>
-      <p>複数の攻略元から更新日・根拠・用途を比較して採用しています。アプリが独自にメンバーを組み合わせることはなく、BlablaLinkの取込値は掲載編成を組めるかの確認にだけ使います。</p>
-      <div className="policy-points">
-        <span>攻略元の5人を固定表示</span>
-        <span>未所持も目標として表示</span>
-        <span>更新日・出典・確認日を明記</span>
-      </div>
-    </article>
 
     <div className="purpose-tabs" role="tablist" aria-label="編成用途">
       {communityPurposes.map((item) => <button key={item.id} className={purpose === item.id ? "active" : ""} onClick={() => setPurpose(item.id)} role="tab" aria-selected={purpose === item.id}>{item.label}</button>)}
@@ -78,7 +67,6 @@ export function TeamsPage({ catalog, records }: Props) {
         </div>
         {entry.team.substitutions.length > 0 && <div className="team-substitutions">
           <h3>掲載元の枠別代替候補</h3>
-          <p>矢印の左が入れ替え対象です。所持状況を見ながら、同じ行の候補へ置き換えられます。</p>
           <div className="substitution-list">{entry.team.substitutions.map((substitution) => {
             const original = entry.team.members[substitution.memberIndex];
             return <div className="substitution-row" key={`${entry.team.id}-${substitution.memberIndex}`}>
@@ -103,7 +91,7 @@ export function TeamsPage({ catalog, records }: Props) {
         <div className="community-source">
           <span>掲載元更新日：{entry.team.source.updated.replaceAll("-", "/")}</span>
           <span>確認日：{entry.team.source.checked.replaceAll("-", "/")}</span>
-          <span>掲載元：{entry.team.source.title}（リンクは設定の「出典・利用条件」に集約）</span>
+          <span>掲載元：{entry.team.source.title}</span>
         </div>
       </article>;
     })}
