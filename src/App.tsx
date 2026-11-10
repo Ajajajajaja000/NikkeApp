@@ -11,7 +11,8 @@ import { useAppData } from "./hooks/useAppData";
 import { clearConnection, createConnection, loadConnection, saveConnection, shouldAutoSync } from "./blablaConnection";
 
 export default function App() {
-  const [page, setPage] = useState<PageId>("home");
+  const initialDetailId = location.hash.startsWith("#nikke/") ? decodeURIComponent(location.hash.slice(7)) : "";
+  const [page, setPage] = useState<PageId>(initialDetailId ? "nikkes" : "home");
   const { data, setData, saveError } = useAppData();
   const [remoteCatalog, setRemoteCatalog] = useState<CharacterSummary[]>([]);
   const [catalogStatus, setCatalogStatus] = useState("APIへ接続しています…");
@@ -19,10 +20,12 @@ export default function App() {
   const [connection, setConnectionState] = useState<BlablaConnection | null>(() => loadConnection());
   const [syncState, setSyncState] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
-  const [focusedNikkeId, setFocusedNikkeId] = useState("");
+  const [detailNikkeId, setDetailNikkeId] = useState(initialDetailId);
   const [nikkeFilters, setNikkeFilters] = useState<NikkeFilters>({ query: "", owned: "all", element: "all", corporation: "all", weapon: "all", burst: "all", sort: "release" });
   const syncing = useRef(false);
   const catalogRequest = useRef<Promise<CharacterSummary[]> | null>(null);
+  const detailOrigin = useRef<PageId>("nikkes");
+  const nikkeScrollY = useRef(0);
 
   const setConnection = useCallback((next: BlablaConnection | null) => {
     setConnectionState(next);
@@ -109,11 +112,60 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", check);
   }, [connection, syncBlabla]);
 
+  const restoreNikkeList = useCallback(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo({ top: nikkeScrollY.current, behavior: "auto" })));
+  }, []);
+  const finishDetail = useCallback(() => {
+    const target = detailOrigin.current === "home" ? "home" : "nikkes";
+    setDetailNikkeId("");
+    setPage(target);
+    if (target === "nikkes") restoreNikkeList(); else requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+  }, [restoreNikkeList]);
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const nextDetailId = typeof event.state?.nikkeDetail === "string" ? event.state.nikkeDetail : "";
+      if (nextDetailId) {
+        setDetailNikkeId(nextDetailId);
+        setPage("nikkes");
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } else if (detailNikkeId) finishDetail();
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [detailNikkeId, finishDetail]);
+
   const updateRecord = (id: string, record: NikkeRecord) => setData((current) => ({ ...current, profile: { ...current.profile, records: { ...current.profile.records, [id]: record } } }));
-  const openNikkes = (characterId?: string) => { setFocusedNikkeId(characterId ?? ""); setPage("nikkes"); };
-  const navigate = (next: PageId) => { if (next !== "nikkes") setFocusedNikkeId(""); setPage(next); };
+  const openNikkeDetail = (characterId: string) => {
+    detailOrigin.current = page === "home" ? "home" : "nikkes";
+    if (page === "nikkes") nikkeScrollY.current = window.scrollY;
+    setDetailNikkeId(characterId);
+    setPage("nikkes");
+    history.pushState({ nikkeDetail: characterId }, "", `${location.pathname}${location.search}#nikke/${encodeURIComponent(characterId)}`);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+  const openNikkes = (characterId?: string) => {
+    if (characterId) { openNikkeDetail(characterId); return; }
+    setDetailNikkeId("");
+    setPage("nikkes");
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+  };
+  const closeNikkeDetail = () => {
+    if (history.state?.nikkeDetail === detailNikkeId) history.back();
+    else {
+      history.replaceState(null, "", `${location.pathname}${location.search}`);
+      finishDetail();
+    }
+  };
+  const navigate = (next: PageId) => {
+    if (detailNikkeId) {
+      history.replaceState(null, "", `${location.pathname}${location.search}`);
+      setDetailNikkeId("");
+      if (next === "nikkes") restoreNikkeList();
+    }
+    setPage(next);
+  };
   const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} lastBlablaImport={data.blablaMeta?.fetchedAt} goNikkes={openNikkes} />
-    : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} filters={nikkeFilters} initialOpenId={focusedNikkeId || undefined} onFiltersChange={setNikkeFilters} onClearFocus={() => setFocusedNikkeId("")} onRecordChange={updateRecord} />
+    : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} filters={nikkeFilters} selectedId={detailNikkeId || undefined} onFiltersChange={setNikkeFilters} onOpenDetail={openNikkeDetail} onCloseDetail={closeNikkeDetail} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} />
     : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;
 

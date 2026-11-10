@@ -1,9 +1,7 @@
 import type { CharacterSummary, NikkeRecord } from "../types";
 import { effectiveCollection, effectiveLevel, growthStatus } from "../rules/growth";
-import { NikkeStatusSummary } from "../components/NikkeStatusSummary";
 import { growthRecommendation } from "../data/growthRecommendations";
 import { overloadRecommendation } from "../data/overloadRecommendations";
-import { effectiveOverloadTargets } from "../rules/overload";
 import { burstLabel, elementLabel } from "../presentation/labels";
 
 interface Props {
@@ -32,7 +30,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
         const record = records[character.id];
         const overload = overloadRecommendation(character.resourceId, character.name, effectiveCollection(record).treasure);
         const shortages = record.imported ? growthStatus(record, growthRecommendation(character.resourceId)?.skills, overload) : ["BlablaLink未取込"];
-        const overloadTargets = effectiveOverloadTargets(record, overload);
+        const visibleShortages = shortages.slice(0, 3);
         return <article className="growth-card" key={character.id}>
           <div className="growth-card-head">
             <div className="rank">{String(index + 1).padStart(2, "0")}</div>
@@ -40,8 +38,7 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
             <div className="growth-card-copy"><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {elementLabel(character.element)} · {burstLabel(character.bursts)}</p></div>
             <button className="growth-jump" type="button" aria-label={`${character.name}の詳細を見る`} onClick={() => goNikkes(character.id)}>›</button>
           </div>
-          <div className="shortage-list">{shortages.length ? shortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}</div>
-          <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} overloadTargets={overloadTargets} /></details>
+          <div className="shortage-list">{visibleShortages.length ? visibleShortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}{shortages.length > visibleShortages.length && <span>ほか{shortages.length - visibleShortages.length}件</span>}</div>
         </article>;
       })}</div>}
   </section>;
