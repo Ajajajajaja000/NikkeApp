@@ -34,10 +34,13 @@ export function HomePage({ catalog, records, lastBlablaImport, goNikkes }: Props
         const shortages = record.imported ? growthStatus(record, growthRecommendation(character.resourceId)?.skills, overload) : ["BlablaLink未取込"];
         const overloadTargets = effectiveOverloadTargets(record, overload);
         return <article className="growth-card" key={character.id}>
-          <div className="rank">{String(index + 1).padStart(2, "0")}</div>
-          <div><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {elementLabel(character.element)} · {burstLabel(character.bursts)}</p></div>
+          <div className="growth-card-head">
+            <div className="rank">{String(index + 1).padStart(2, "0")}</div>
+            <div className="growth-avatar">{character.icon ? <img src={character.icon} alt="" loading="lazy" /> : <span>{character.name.slice(0, 1)}</span>}</div>
+            <div className="growth-card-copy"><h3>{character.name}</h3><p className="muted">Lv.{effectiveLevel(record)} · {elementLabel(character.element)} · {burstLabel(character.bursts)}</p></div>
+            <button className="growth-jump" type="button" aria-label={`${character.name}の詳細を見る`} onClick={() => goNikkes(character.id)}>›</button>
+          </div>
           <div className="shortage-list">{shortages.length ? shortages.map((item) => <span key={item}>{item}</span>) : <span className="complete">目標達成</span>}</div>
-          <button className="secondary growth-open-button" onClick={() => goNikkes(character.id)}>ニケ一覧で詳細を見る</button>
           <details className="growth-details"><summary>育成状況・装備・オバロを表示</summary><NikkeStatusSummary record={record} overloadTargets={overloadTargets} /></details>
         </article>;
       })}</div>}
