@@ -14,7 +14,7 @@ function limitBreakLabel(value: number) {
 }
 
 export function NikkeStatusOverview({ record }: { record: NikkeRecord }) {
-  if (!record.imported) return <div className="import-missing">BlablaLinkから現在値をまだ取得していません。設定画面から取り込むと、育成状況を表示します。</div>;
+  if (!record.imported) return <div className="import-missing">育成データ未取得</div>;
 
   const skills = effectiveSkills(record);
   const cube = effectiveCube(record);
@@ -30,7 +30,7 @@ export function NikkeStatusOverview({ record }: { record: NikkeRecord }) {
 }
 
 export function NikkeEquipmentSummary({ record, overloadTargets = [] }: { record: NikkeRecord; overloadTargets?: OverloadTarget[] }) {
-  if (!record.imported) return <div className="import-missing">BlablaLinkから現在値をまだ取得していません。設定画面から取り込むと、装備・オバロを表示します。</div>;
+  if (!record.imported) return <div className="import-missing">装備データ未取得</div>;
 
   return <div className="equipment-grid" aria-label="装備・オーバーロード状況">
     {slots.map((slot) => {
