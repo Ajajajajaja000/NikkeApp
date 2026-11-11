@@ -164,7 +164,7 @@ export default function App() {
     }
     setPage(next);
   };
-  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} goNikkes={openNikkes} />
+  const content = page === "home" ? <HomePage catalog={catalog} records={data.profile.records} goNikkes={openNikkes} onRecordChange={updateRecord} />
     : page === "nikkes" ? <NikkePage catalog={catalog} records={data.profile.records} filters={nikkeFilters} selectedId={detailNikkeId || undefined} onFiltersChange={setNikkeFilters} onOpenDetail={openNikkeDetail} onCloseDetail={closeNikkeDetail} onRecordChange={updateRecord} />
     : page === "teams" ? <TeamsPage catalog={catalog} records={data.profile.records} />
     : <SettingsPage data={data} catalog={catalog} catalogStatus={catalogStatus} catalogLoading={catalogLoading} connection={connection} syncState={syncState} isSyncing={isSyncing} onConnect={connectBlabla} onSync={() => syncBlabla()} onConnectionChange={setConnection} onDataChange={setData} onRefresh={refresh} />;

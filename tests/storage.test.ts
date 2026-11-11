@@ -22,16 +22,25 @@ describe("backup schema", () => {
   });
 
   it("不正なバージョンを拒否する", () => {
-    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2〜4/);
+    expect(() => validateImport({ version: 99, profile: {} })).toThrow(/バージョン2〜5/);
   });
 
-  it("バージョン2を4へ移行する", () => {
+  it("バージョン2を5へ移行する", () => {
     const old = { ...createDefaultData(), version: 2 };
     old.profile.records.x = { owned: true, favorite: false, skills: [1, 1, 1], cube: { name: "なし", level: 0 } };
     const migrated = validateImport(JSON.parse(JSON.stringify(old)));
-    expect(migrated.version).toBe(4);
+    expect(migrated.version).toBe(5);
     expect(migrated.profile.records.x.skills).toBeUndefined();
     expect(migrated.profile.records.x.cube).toBeUndefined();
+  });
+
+  it("バージョン4を5へ移行し既存の育成対象を中優先度として扱える", () => {
+    const old = JSON.parse(JSON.stringify(createDefaultData()));
+    old.version = 4;
+    old.profile.records.x = { owned: true, favorite: true };
+    const migrated = validateImport(old);
+    expect(migrated.version).toBe(5);
+    expect(migrated.profile.records.x.growthPriority).toBeUndefined();
   });
 
   it("バージョン3のオバロ目標を型付き条件へ移行し編成保存を削除する", () => {

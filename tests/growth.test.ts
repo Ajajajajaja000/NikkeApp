@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateCoreDust, coreDustForLevel, growthShortages, growthStatus } from "../src/rules/growth";
+import { calculateCoreDust, compareGrowthPriority, coreDustForLevel, effectiveGrowthPriority, growthShortages, growthStatus } from "../src/rules/growth";
 import { growthRecommendation } from "../src/data/growthRecommendations";
 
 describe("core dust calculator", () => {
@@ -64,5 +64,20 @@ describe("growth shortages", () => {
   it("紅蓮：神殺の実装後スキル目標を使う", () => {
     expect(growthRecommendation(472)).toMatchObject({ skills: [10, 10, 10], agreement: "複数ソース一致", checked: "2026-11-05" });
     expect(growthRecommendation(872)).toMatchObject({ skills: [1, 1, 1], agreement: "単一ソース参考" });
+  });
+});
+
+describe("growth priority", () => {
+  it("未設定の既存データは中優先度として扱う", () => {
+    expect(effectiveGrowthPriority({ owned: true, favorite: true })).toBe("medium");
+  });
+
+  it("高・中・低の順に並べる", () => {
+    const records = [
+      { owned: true, favorite: true, growthPriority: "low" as const },
+      { owned: true, favorite: true },
+      { owned: true, favorite: true, growthPriority: "high" as const },
+    ];
+    expect(records.sort(compareGrowthPriority).map(effectiveGrowthPriority)).toEqual(["high", "medium", "low"]);
   });
 });
