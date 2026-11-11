@@ -1,6 +1,16 @@
-import type { CollectionRecord, CoreDustState, CubeRecord, GearRecord, GearSlot, NikkeRecord } from "../types";
+import type { CollectionRecord, CoreDustState, CubeRecord, GearRecord, GearSlot, GrowthPriority, NikkeRecord } from "../types";
 import type { OverloadRecommendation } from "../data/overloadRecommendations";
 import { assessOverload, effectiveOverloadTargets } from "./overload";
+
+const growthPriorityOrder: Record<GrowthPriority, number> = { high: 2, medium: 1, low: 0 };
+
+export function effectiveGrowthPriority(record: NikkeRecord | undefined): GrowthPriority {
+  return record?.growthPriority === "high" || record?.growthPriority === "low" ? record.growthPriority : "medium";
+}
+
+export function compareGrowthPriority(a: NikkeRecord | undefined, b: NikkeRecord | undefined): number {
+  return growthPriorityOrder[effectiveGrowthPriority(b)] - growthPriorityOrder[effectiveGrowthPriority(a)];
+}
 
 export function effectiveLevel(record: NikkeRecord | undefined): number {
   return record?.imported?.level ?? record?.level ?? 1;

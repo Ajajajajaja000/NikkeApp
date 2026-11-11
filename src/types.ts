@@ -1,5 +1,6 @@
 export type BurstStage = "I" | "II" | "III";
 export type GearSlot = "head" | "chest" | "arms" | "legs";
+export type GrowthPriority = "high" | "medium" | "low";
 
 export interface CharacterSummary {
   id: string;
@@ -81,6 +82,7 @@ export interface NikkeRecord {
   displayName?: string;
   owned: boolean;
   favorite: boolean;
+  growthPriority?: GrowthPriority;
   level?: number;
   limitBreak?: number;
   combatPower?: number;
@@ -118,7 +120,7 @@ export interface LocalProfile {
 }
 
 export interface AppData {
-  version: 4;
+  version: 5;
   profile: LocalProfile;
   catalogMeta?: { fetchedAt: string; source: string; count: number };
   blablaMeta?: { fetchedAt: string; source: string; count: number };
